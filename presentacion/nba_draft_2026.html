@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Periodismo que Viene — NBA Draft 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0a0e1a; }
+
+:root {
+  --navy:   #0d1117;
+  --navy2:  #131929;
+  --navy3:  #1a2236;
+  --orange: #f97316;
+  --gold:   #fbbf24;
+  --white:  #f0f4ff;
+  --gray:   #8892a4;
+  --card:   #1a2640;
+}
+
+#deck { width:100%; height:100%; position:relative; }
+
+.slide {
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:5vh 7vw;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  transform: translateX(60px);
+  font-family:'Inter',sans-serif;
+  color:var(--white);
+  overflow:hidden;
+}
+.slide.active { opacity:1; pointer-events:all; transform:translateX(0); }
+.slide.exit   { opacity:0; transform:translateX(-60px); }
+
+/* BACKGROUNDS */
+.bg-dark  { background:linear-gradient(135deg,#0d1117 0%,#131929 100%); }
+.bg-cream { background:linear-gradient(135deg,#f5f0e8 0%,#ede8df 100%); color:#111; }
+.bg-mid   { background:linear-gradient(135deg,#141a26 0%,#1a2236 100%); }
+
+/* PROGRESS */
+#progress { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--orange),var(--gold)); transition:width .4s ease; z-index:200; }
+
+/* NAV */
+#nav {
+  position:fixed; bottom:3vh; left:50%; transform:translateX(-50%);
+  display:flex; align-items:center; gap:16px; z-index:100;
+  background:rgba(13,17,23,0.9); backdrop-filter:blur(12px);
+  padding:10px 22px; border-radius:50px;
+  border:1px solid rgba(249,115,22,0.2);
+}
+.nbtn { width:36px; height:36px; border-radius:50%; border:none; cursor:pointer; background:var(--navy3); color:var(--orange); font-size:15px; display:flex; align-items:center; justify-content:center; transition:.2s; }
+.nbtn:hover { background:var(--orange); color:#fff; }
+#dots { display:flex; gap:6px; align-items:center; }
+.dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,0.18); cursor:pointer; transition:.3s; }
+.dot.on { background:var(--orange); transform:scale(1.5); }
+#ctr { font-size:11px; color:var(--gray); font-family:'Oswald',sans-serif; letter-spacing:2px; min-width:36px; text-align:center; }
+#fsb { width:30px; height:30px; border-radius:8px; border:none; cursor:pointer; background:var(--navy3); color:var(--gray); font-size:13px; display:flex; align-items:center; justify-content:center; transition:.2s; }
+#fsb:hover { color:var(--orange); }
+
+/* WATERMARK */
+.wm { position:absolute; bottom:2vh; right:2.5vw; font-family:'Oswald',sans-serif; font-size:clamp(9px,0.9vw,12px); letter-spacing:4px; color:rgba(255,255,255,0.06); pointer-events:none; }
+.wm-dark { color:rgba(0,0,0,0.06); }
+
+/* HINT */
+#hint { position:fixed; top:2vh; right:2vw; font-size:10px; color:rgba(255,255,255,0.2); font-family:'Inter',sans-serif; letter-spacing:1px; z-index:100; }
+
+/* TYPOGRAPHY */
+.tag { font-family:'Oswald',sans-serif; font-size:clamp(9px,1vw,12px); letter-spacing:4px; text-transform:uppercase; color:var(--orange); margin-bottom:0.8vh; }
+.tag-dark { color:#c2410c; }
+.h1 { font-family:'Oswald',sans-serif; font-size:clamp(30px,5.5vw,76px); font-weight:700; line-height:0.92; }
+.h2 { font-family:'Oswald',sans-serif; font-size:clamp(22px,3.2vw,44px); font-weight:600; line-height:1; }
+.h3 { font-family:'Oswald',sans-serif; font-size:clamp(15px,1.8vw,24px); font-weight:600; }
+.body { font-size:clamp(12px,1.2vw,16px); line-height:1.75; color:rgba(240,244,255,0.7); }
+.body-dark { color:rgba(20,20,20,0.7); }
+.accent { color:var(--orange); }
+.bold { font-weight:700; color:var(--white); }
+.bold-dark { font-weight:700; color:#111; }
+
+.abar { width:5px; border-radius:3px; background:var(--orange); flex-shrink:0; }
+.trow { display:flex; align-items:flex-start; gap:14px; }
+
+/* CARDS */
+.card { background:var(--card); border-radius:14px; padding:clamp(14px,2vw,22px); border:1px solid rgba(249,115,22,0.1); transition:.2s; }
+.card:hover { border-color:rgba(249,115,22,0.3); transform:translateY(-2px); }
+.card-light { background:rgba(255,255,255,0.6); border-radius:14px; padding:clamp(14px,2vw,22px); border:1px solid rgba(0,0,0,0.08); }
+
+/* PILL */
+.pill { background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.3); border-radius:50px; padding:8px 18px; font-family:'Oswald',sans-serif; font-size:clamp(11px,1.1vw,14px); color:var(--white); text-align:center; }
+
+/* BADGE */
+.badge { display:inline-block; background:var(--orange); color:#fff; font-family:'Oswald',sans-serif; font-size:clamp(11px,1.1vw,15px); font-weight:700; padding:9px 22px; border-radius:7px; letter-spacing:2px; text-transform:uppercase; }
+
+/* ======= SLIDE 1: PORTADA ======= */
+.s1-bg { position:absolute; inset:0; background:linear-gradient(135deg,#0d1117 0%,#131929 60%,#1a0d05 100%); }
+.s1-deco { position:absolute; right:-2vw; top:-5vh; font-family:'Oswald',sans-serif; font-size:clamp(160px,26vw,340px); font-weight:700; color:rgba(249,115,22,0.06); line-height:1; pointer-events:none; }
+.s1-content { position:relative; z-index:2; display:grid; grid-template-columns:1fr 1fr; height:100%; align-items:center; gap:4vw; }
+.s1-label { font-family:'Oswald',sans-serif; font-size:clamp(9px,1vw,13px); letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:1.5vh; }
+.s1-title { font-family:'Oswald',sans-serif; font-size:clamp(28px,5vw,68px); font-weight:700; line-height:0.95; }
+.s1-title em { color:var(--orange); font-style:normal; display:block; }
+.s1-sub { margin-top:2vh; font-size:clamp(12px,1.2vw,16px); color:rgba(240,244,255,0.5); line-height:1.65; max-width:400px; }
+.s1-right { display:flex; flex-direction:column; align-items:flex-end; gap:0; }
+.s1-editorial { font-family:'Oswald',sans-serif; font-size:clamp(20px,3.5vw,46px); font-weight:700; line-height:1.05; text-align:right; color:var(--white); }
+.s1-editorial span { color:var(--orange); }
+.s1-line { width:60px; height:3px; background:var(--orange); margin:2vh 0 2vh auto; border-radius:2px; }
+.s1-esub { font-size:clamp(9px,1vw,12px); color:rgba(255,255,255,0.25); letter-spacing:3px; text-transform:uppercase; text-align:right; }
+.s1-players { margin-top:3vh; text-align:right; }
+.s1-players p { font-family:'Oswald',sans-serif; font-size:clamp(13px,1.6vw,20px); color:rgba(255,255,255,0.4); line-height:1.6; }
+.s1-players p span { color:rgba(249,115,22,0.7); }
+
+/* ======= SLIDE 2: EL PROBLEMA ======= */
+.s2-layout { display:grid; grid-template-columns:1fr 1fr; gap:5vw; align-items:center; margin-top:3vh; }
+.s2-quote { background:rgba(249,115,22,0.08); border-left:4px solid var(--orange); border-radius:0 10px 10px 0; padding:clamp(14px,2vw,22px); margin-top:2.5vh; }
+.s2-quote p { font-family:'Oswald',sans-serif; font-size:clamp(14px,1.6vw,22px); color:var(--white); font-style:italic; line-height:1.4; }
+.s2-quote small { font-size:clamp(10px,1vw,13px); color:var(--gray); margin-top:8px; display:block; }
+.s2-right { display:flex; flex-direction:column; gap:1.5vh; }
+.s2-vs { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw; }
+.s2-col { padding:clamp(14px,2vw,22px); border-radius:12px; }
+.s2-col h4 { font-family:'Oswald',sans-serif; font-size:clamp(13px,1.4vw,18px); margin-bottom:1.2vh; letter-spacing:1px; }
+.s2-col ul { list-style:none; }
+.s2-col ul li { font-size:clamp(11px,1.1vw,13px); line-height:1.8; padding-left:14px; position:relative; }
+.s2-col ul li::before { content:'—'; position:absolute; left:0; opacity:0.5; }
+.s2-bad  { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); }
+.s2-bad  h4 { color:#f87171; }
+.s2-bad  ul li { color:rgba(240,244,255,0.55); }
+.s2-good { background:rgba(249,115,22,0.08); border:1px solid rgba(249,115,22,0.2); }
+.s2-good h4 { color:var(--orange); }
+.s2-good ul li { color:rgba(240,244,255,0.7); }
+.s2-bigq { font-family:'Oswald',sans-serif; font-size:clamp(16px,2vw,26px); color:var(--white); line-height:1.3; margin-top:2vh; }
+.s2-bigq em { color:var(--orange); font-style:normal; }
+
+/* ======= SLIDE 3: LA PROPUESTA ======= */
+.s3-layout { display:grid; grid-template-columns:1.2fr 1fr; gap:5vw; align-items:center; margin-top:2.5vh; }
+.s3-steps { display:flex; flex-direction:column; gap:1.5vh; margin-top:2.5vh; }
+.s3-step { display:flex; align-items:flex-start; gap:16px; }
+.s3-num { font-family:'Oswald',sans-serif; font-size:clamp(28px,4vw,52px); color:rgba(249,115,22,0.2); line-height:1; flex-shrink:0; width:clamp(36px,4vw,56px); }
+.s3-text h4 { font-family:'Oswald',sans-serif; font-size:clamp(13px,1.5vw,20px); color:var(--white); margin-bottom:4px; }
+.s3-text p { font-size:clamp(11px,1.1vw,14px); color:var(--gray); line-height:1.6; }
+.s3-right-card { background:var(--card); border-radius:16px; padding:clamp(20px,3vw,32px); border:1px solid rgba(249,115,22,0.15); }
+.s3-output { margin-top:2vh; background:rgba(0,0,0,0.3); border-radius:10px; padding:clamp(12px,1.5vw,18px); font-family:'Oswald',sans-serif; }
+.s3-output-row { display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.s3-output-row:last-child { border-bottom:none; }
+.s3-output-row .lbl { font-size:clamp(9px,0.9vw,12px); color:var(--gray); letter-spacing:2px; }
+.s3-output-row .val { font-size:clamp(12px,1.3vw,17px); color:var(--orange); font-weight:700; }
+
+/* ======= SLIDE 4: NUESTRO PROYECTO ======= */
+.s4-layout { display:grid; grid-template-columns:1fr 1fr; gap:5vw; align-items:center; margin-top:2.5vh; }
+.s4-data { display:grid; grid-template-columns:1fr 1fr; gap:1.5vw; margin-top:2vh; }
+.s4-stat { text-align:center; padding:clamp(12px,1.5vw,18px); background:rgba(249,115,22,0.07); border:1px solid rgba(249,115,22,0.15); border-radius:12px; }
+.s4-stat .n { font-family:'Oswald',sans-serif; font-size:clamp(28px,4vw,52px); color:var(--orange); line-height:1; font-weight:700; }
+.s4-stat .l { font-size:clamp(9px,0.9vw,12px); color:var(--gray); letter-spacing:2px; margin-top:4px; text-transform:uppercase; }
+.s4-pipeline { display:flex; align-items:center; gap:0; margin-top:2.5vh; flex-wrap:wrap; }
+.ps { flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); padding:10px 6px; text-align:center; min-width:80px; }
+.ps.final { background:rgba(249,115,22,0.12); border-color:var(--orange); }
+.ps .pn { font-family:'Oswald',sans-serif; font-size:clamp(14px,1.8vw,22px); color:var(--orange); }
+.ps .pl { font-size:clamp(8px,0.85vw,10px); color:var(--gray); margin-top:2px; letter-spacing:1px; }
+.pa { color:var(--orange); padding:0 4px; font-size:16px; flex-shrink:0; }
+
+/* ======= SLIDE 5: CÓMO FUNCIONA ======= */
+.s5-layout { display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; margin-top:3vh; }
+.s5-model { background:var(--card); border-radius:14px; padding:clamp(16px,2.5vw,28px); border-top:4px solid transparent; transition:.2s; }
+.s5-model:hover { transform:translateY(-3px); }
+.s5-model:nth-child(1) { border-color:var(--orange); }
+.s5-model:nth-child(2) { border-color:var(--gold); }
+.s5-model:nth-child(3) { border-color:#60a5fa; }
+.s5-num { font-family:'Oswald',sans-serif; font-size:clamp(42px,6vw,80px); color:rgba(255,255,255,0.06); line-height:1; }
+.s5-model h3 { font-family:'Oswald',sans-serif; font-size:clamp(16px,2vw,26px); margin-bottom:1vh; }
+.s5-model:nth-child(1) h3 { color:var(--orange); }
+.s5-model:nth-child(2) h3 { color:var(--gold); }
+.s5-model:nth-child(3) h3 { color:#60a5fa; }
+.s5-model p { font-size:clamp(11px,1.1vw,14px); color:var(--gray); line-height:1.65; }
+.s5-example { margin-top:1.5vh; background:rgba(0,0,0,0.25); border-radius:8px; padding:10px 14px; font-family:'Oswald',sans-serif; font-size:clamp(12px,1.2vw,16px); color:var(--orange); }
+
+/* ======= SLIDE 6: LOS TRES ======= */
+.s6-players { display:grid; grid-template-columns:repeat(3,1fr); gap:2vw; margin-top:3vh; }
+.s6-player { border-radius:16px; padding:clamp(16px,2.5vw,26px); position:relative; overflow:hidden; transition:.2s; }
+.s6-player:hover { transform:translateY(-4px); }
+.s6-player:nth-child(1) { background:linear-gradient(135deg,#2d0a14,#1a0508); border:1px solid rgba(249,115,22,0.25); }
+.s6-player:nth-child(2) { background:linear-gradient(135deg,#1a1200,#0e0c02); border:1px solid rgba(251,191,36,0.25); }
+.s6-player:nth-child(3) { background:linear-gradient(135deg,#051030,#020510); border:1px solid rgba(96,165,250,0.25); }
+.s6-accent { width:100%; height:4px; border-radius:2px; margin-bottom:1.5vh; }
+.s6-player:nth-child(1) .s6-accent { background:var(--orange); }
+.s6-player:nth-child(2) .s6-accent { background:var(--gold); }
+.s6-player:nth-child(3) .s6-accent { background:#60a5fa; }
+.s6-name { font-family:'Oswald',sans-serif; font-size:clamp(20px,2.8vw,36px); font-weight:700; color:var(--white); line-height:1; }
+.s6-pos { font-size:clamp(9px,0.9vw,12px); color:var(--gray); letter-spacing:2px; text-transform:uppercase; margin:6px 0 1.8vh; }
+.s6-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:1.8vh; }
+.s6-stat { background:rgba(255,255,255,0.05); border-radius:8px; padding:8px 10px; }
+.s6-stat .k { font-size:clamp(8px,0.8vw,10px); color:var(--gray); letter-spacing:1px; }
+.s6-stat .v { font-family:'Oswald',sans-serif; font-size:clamp(16px,2vw,24px); color:var(--white); }
+.s6-comparable { font-size:clamp(10px,1vw,13px); color:var(--gray); margin-bottom:1.2vh; }
+.s6-comparable span { color:var(--white); font-weight:600; }
+.s6-mock { display:inline-block; padding:7px 16px; border-radius:6px; font-family:'Oswald',sans-serif; font-size:clamp(10px,1vw,13px); font-weight:700; letter-spacing:2px; }
+.s6-player:nth-child(1) .s6-mock { background:var(--orange); color:#fff; }
+.s6-player:nth-child(2) .s6-mock { background:var(--gold); color:#000; }
+.s6-player:nth-child(3) .s6-mock { background:#60a5fa; color:#000; }
+.s6-silhouette { position:absolute; right:10px; top:10px; opacity:0.12; pointer-events:none; }
+
+/* ======= SLIDE 7: EL PRODUCTO ======= */
+.s7-layout { display:grid; grid-template-columns:1fr 1fr; gap:5vw; align-items:center; margin-top:2.5vh; }
+.s7-app { background:var(--card); border-radius:16px; padding:clamp(18px,2.5vw,28px); border:1px solid rgba(249,115,22,0.2); }
+.s7-app-bar { background:rgba(0,0,0,0.3); border-radius:8px 8px 0 0; padding:10px 16px; display:flex; gap:8px; align-items:center; margin:-clamp(18px,2.5vw,28px) -clamp(18px,2.5vw,28px) 2vh; }
+.s7-dot { width:10px; height:10px; border-radius:50%; }
+.s7-fields { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:1.5vh; }
+.s7-field { background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:10px 14px; }
+.s7-field label { font-size:clamp(8px,0.85vw,11px); color:var(--gray); letter-spacing:1px; display:block; margin-bottom:4px; }
+.s7-field span { font-family:'Oswald',sans-serif; font-size:clamp(13px,1.4vw,18px); color:var(--white); }
+.s7-btn { width:100%; background:var(--orange); color:#fff; border:none; border-radius:8px; padding:12px; font-family:'Oswald',sans-serif; font-size:clamp(13px,1.4vw,18px); font-weight:700; letter-spacing:2px; cursor:pointer; margin-bottom:1.5vh; transition:.2s; }
+.s7-btn:hover { background:#ea6500; }
+.s7-results { background:rgba(0,0,0,0.25); border-radius:10px; padding:clamp(12px,1.5vw,18px); }
+.s7-result-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+.s7-result-row:last-child { border-bottom:none; }
+.s7-result-row .rl { font-size:clamp(9px,0.9vw,12px); color:var(--gray); letter-spacing:2px; font-family:'Oswald',sans-serif; }
+.s7-result-row .rv { font-size:clamp(12px,1.3vw,17px); color:var(--orange); font-weight:700; font-family:'Oswald',sans-serif; }
+.s7-features { display:flex; flex-direction:column; gap:1.5vh; }
+.s7-feat { display:flex; align-items:flex-start; gap:14px; }
+.s7-feat-icon { width:36px; height:36px; border-radius:8px; background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.2); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.s7-feat-text h4 { font-family:'Oswald',sans-serif; font-size:clamp(13px,1.4vw,18px); color:var(--white); }
+.s7-feat-text p { font-size:clamp(10px,1vw,13px); color:var(--gray); line-height:1.5; }
+
+/* ======= SLIDE 8: POR QUÉ AHORA ======= */
+.s8-layout { display:grid; grid-template-columns:1fr 1fr; gap:5vw; align-items:center; margin-top:2.5vh; }
+.s8-reasons { display:flex; flex-direction:column; gap:1.5vh; }
+.s8-reason { display:flex; align-items:flex-start; gap:14px; padding:clamp(12px,1.5vw,18px); background:var(--card); border-radius:12px; border:1px solid rgba(249,115,22,0.1); }
+.s8-reason-icon { font-size:clamp(20px,2.5vw,30px); flex-shrink:0; }
+.s8-reason-text h4 { font-family:'Oswald',sans-serif; font-size:clamp(13px,1.4vw,18px); color:var(--white); margin-bottom:4px; }
+.s8-reason-text p { font-size:clamp(10px,1vw,13px); color:var(--gray); line-height:1.5; }
+.s8-right { display:flex; flex-direction:column; gap:2vh; }
+.s8-stat-big { text-align:center; padding:clamp(16px,2.5vw,28px); background:rgba(249,115,22,0.08); border:1px solid rgba(249,115,22,0.2); border-radius:14px; }
+.s8-stat-big .n { font-family:'Oswald',sans-serif; font-size:clamp(48px,7vw,90px); color:var(--orange); line-height:1; font-weight:700; }
+.s8-stat-big .l { font-size:clamp(10px,1vw,14px); color:var(--gray); margin-top:6px; line-height:1.4; }
+
+/* ======= SLIDE 9: CIERRE ======= */
+.s9-bg { position:absolute; inset:0; background:linear-gradient(135deg,#0d1117,#1a0d05); }
+.s9-deco { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; }
+.s9-deco-txt { font-family:'Oswald',sans-serif; font-size:clamp(100px,18vw,240px); font-weight:700; color:rgba(249,115,22,0.04); line-height:1; }
+.s9-content { position:relative; z-index:2; text-align:center; max-width:800px; margin:0 auto; }
+.s9-pretitle { font-family:'Oswald',sans-serif; font-size:clamp(10px,1.1vw,14px); letter-spacing:5px; color:var(--gray); text-transform:uppercase; margin-bottom:2vh; }
+.s9-title { font-family:'Oswald',sans-serif; font-size:clamp(36px,6.5vw,88px); font-weight:700; line-height:0.92; }
+.s9-title em { color:var(--orange); font-style:normal; }
+.s9-line { width:80px; height:4px; background:var(--orange); margin:3vh auto; border-radius:2px; }
+.s9-sub { font-size:clamp(13px,1.4vw,18px); color:rgba(240,244,255,0.5); line-height:1.7; max-width:560px; margin:0 auto; }
+.s9-footer { margin-top:4vh; }
+.s9-footer h3 { font-family:'Oswald',sans-serif; font-size:clamp(16px,2vw,26px); color:var(--white); }
+.s9-footer p { font-size:clamp(10px,1vw,13px); color:var(--gray); margin-top:4px; }
+.s9-tags { display:flex; gap:10px; justify-content:center; margin-top:2vh; flex-wrap:wrap; }
+.s9-tag { background:rgba(249,115,22,0.1); border:1px solid rgba(249,115,22,0.25); border-radius:50px; padding:6px 16px; font-size:clamp(9px,0.9vw,12px); color:var(--orange); font-weight:600; letter-spacing:1px; }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="hint">← → · Espacio · F</div>
+
+<div id="deck">
+
+<!-- ===== SLIDE 1: PORTADA ===== -->
+<div class="slide bg-dark active" id="s1">
+  <div class="s1-bg"></div>
+  <div class="s1-deco">26</div>
+  <div class="s1-content">
+    <div class="s1-left">
+      <div class="s1-label">Proyecto Machine Learning · The Bridge 2026</div>
+      <div class="s1-title">
+        EL PERIODISMO<br>
+        <em>QUE VIENE</em>
+      </div>
+      <div class="s1-sub">Cuando los datos y el Machine Learning se convierten en una herramienta periodística. El Draft NBA como primer caso de uso.</div>
+      <div class="badge" style="margin-top:3vh;">Roberto Cantero</div>
+    </div>
+    <div class="s1-right">
+      <div class="s1-editorial">
+        CUANDO<br>LA IA<br><span>PREDICE</span><br>EL DRAFT
+      </div>
+      <div class="s1-line"></div>
+      <div class="s1-esub">Periodismo de datos · NBA 2026</div>
+      <div class="s1-players">
+        <p><span>🇪🇸</span> Aday Mara · Baba Miller · Sergio De Larrea</p>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 2: QUÉ ES EL DRAFT ===== -->
+<div class="slide bg-mid" id="s-draft">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">Contexto</div>
+      <div class="h1">¿QUÉ ES EL<br>NBA DRAFT?</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:5vw;align-items:center;margin-top:3vh;">
+    <div>
+      <p class="body" style="margin-bottom:2.5vh;">El <span style="color:var(--orange);font-weight:700;">NBA Draft</span> es el proceso anual mediante el cual los <span style="color:var(--white);font-weight:700;">30 equipos de la NBA</span> seleccionan a los mejores jugadores jóvenes del mundo.</p>
+      <p class="body" style="margin-bottom:2.5vh;">Consta de <span style="color:var(--white);font-weight:700;">2 rondas y 60 picks</span>. Cada equipo elige en orden inverso a su clasificación: el peor equipo elige primero.</p>
+      <p class="body">La posición en la que eres elegido lo determina <span style="color:var(--orange);font-weight:700;">todo</span>: tu contrato, tu equipo, tu rol... y en muchos casos, tu carrera entera.</p>
+      <div style="display:flex;gap:1.5vw;margin-top:2.5vh;flex-wrap:wrap;">
+        <div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:clamp(10px,1.5vw,16px) clamp(14px,2vw,22px);text-align:center;">
+          <div style="font-family:Oswald,sans-serif;font-size:clamp(28px,4vw,52px);color:var(--orange);line-height:1;font-weight:700;">30</div>
+          <div style="font-size:clamp(9px,0.9vw,12px);color:var(--gray);letter-spacing:2px;margin-top:4px;">EQUIPOS NBA</div>
+        </div>
+        <div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:clamp(10px,1.5vw,16px) clamp(14px,2vw,22px);text-align:center;">
+          <div style="font-family:Oswald,sans-serif;font-size:clamp(28px,4vw,52px);color:var(--orange);line-height:1;font-weight:700;">2</div>
+          <div style="font-size:clamp(9px,0.9vw,12px);color:var(--gray);letter-spacing:2px;margin-top:4px;">RONDAS</div>
+        </div>
+        <div style="background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);border-radius:10px;padding:clamp(10px,1.5vw,16px) clamp(14px,2vw,22px);text-align:center;">
+          <div style="font-family:Oswald,sans-serif;font-size:clamp(28px,4vw,52px);color:var(--orange);line-height:1;font-weight:700;">60</div>
+          <div style="font-size:clamp(9px,0.9vw,12px);color:var(--gray);letter-spacing:2px;margin-top:4px;">PICKS TOTALES</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1.5vh;">
+      <div style="background:var(--card);border-radius:14px;padding:clamp(14px,2vw,22px);border:1px solid rgba(249,115,22,0.15);">
+        <div style="font-family:Oswald,sans-serif;font-size:clamp(10px,1vw,13px);letter-spacing:3px;color:var(--gray);margin-bottom:1.5vh;">ESTRUCTURA DEL DRAFT</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="background:var(--orange);border-radius:6px;padding:6px 14px;font-family:Oswald,sans-serif;font-size:clamp(12px,1.3vw,16px);font-weight:700;color:#fff;min-width:90px;text-align:center;">Picks 1-30</div>
+            <span class="body"><span style="color:var(--white);font-weight:700;">Primera Ronda</span> — Contratos garantizados, máximo salario rookie</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="background:#334155;border-radius:6px;padding:6px 14px;font-family:Oswald,sans-serif;font-size:clamp(12px,1.3vw,16px);font-weight:700;color:var(--gray);min-width:90px;text-align:center;">Picks 31-60</div>
+            <span class="body"><span style="color:var(--white);font-weight:700;">Segunda Ronda</span> — Contratos no garantizados, más difícil consolidarse</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="background:#1e1e2e;border-radius:6px;padding:6px 14px;font-family:Oswald,sans-serif;font-size:clamp(12px,1.3vw,16px);font-weight:700;color:#444;min-width:90px;text-align:center;">No elegido</div>
+            <span class="body" style="color:var(--gray);">Pueden firmar como agentes libres, sin garantías</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);border-radius:12px;padding:clamp(12px,1.5vw,18px);">
+        <p class="body"><span style="color:var(--orange);font-weight:700;">Pick #1</span> — Victor Wembanyama (2023). Contratos de hasta <span style="color:var(--white);font-weight:700;">$10M/año</span> de rookie.</p>
+        <p class="body" style="margin-top:8px;"><span style="color:var(--gray);">Pick #60</span> — Muchos nunca juegan en la NBA. La diferencia entre el 1 y el 60 puede ser toda una carrera.</p>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 2: EL PROBLEMA ===== -->
+<div class="slide bg-dark" id="s2">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">El punto de partida</div>
+      <div class="h1">¿HAY OTRA FORMA<br>DE CUBRIR EL DRAFT?</div>
+    </div>
+  </div>
+  <div class="s2-layout">
+    <div>
+      <p class="body" style="margin-bottom:2.5vh;">Cada año, miles de artículos predicen el Draft de la NBA. Todos se basan en lo mismo: la opinión de scouts, analistas y periodistas especializados.</p>
+      <div class="s2-quote">
+        <p>"Creo que Aday Mara tiene potencial para ser top 10, pero le falta consistencia en el tiro exterior..."</p>
+        <small>— Cualquier analista, cualquier año</small>
+      </div>
+      <div class="s2-bigq" style="margin-top:2.5vh;">
+        ¿Y si el artículo estuviera respaldado por<br><em>datos objetivos y un modelo de ML?</em>
+      </div>
+    </div>
+    <div class="s2-vs">
+      <div class="s2-col s2-bad">
+        <h4>ENFOQUE ACTUAL</h4>
+        <ul>
+          <li>Opinión subjetiva</li>
+          <li>Difícil de contrastar</li>
+          <li>Todos dicen lo mismo</li>
+          <li>Sin metodología clara</li>
+          <li>No reproducible</li>
+        </ul>
+      </div>
+      <div class="s2-col s2-good">
+        <h4>NUEVO ENFOQUE</h4>
+        <ul>
+          <li>Datos objetivos</li>
+          <li>Metodología clara</li>
+          <li>Diferenciador editorial</li>
+          <li>Reproducible</li>
+          <li>Escalable</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 3: LA PROPUESTA ===== -->
+<div class="slide bg-mid" id="s3">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">La propuesta</div>
+      <div class="h1">ML COMO HERRAMIENTA<br>PERIODÍSTICA</div>
+    </div>
+  </div>
+  <div class="s3-layout">
+    <div>
+      <p class="body" style="margin-bottom:0;">No se trata de reemplazar al periodista. Se trata de darle una herramienta nueva: un modelo de Machine Learning que analiza datos históricos y genera predicciones objetivas que respaldan el artículo.</p>
+      <div class="s3-steps">
+        <div class="s3-step">
+          <div class="s3-num">01</div>
+          <div class="s3-text">
+            <h4>El periodista elige el tema</h4>
+            <p>El Draft NBA, el mercado de fichajes, el rendimiento de un jugador. Cualquier evento con datos históricos.</p>
+          </div>
+        </div>
+        <div class="s3-step">
+          <div class="s3-num">02</div>
+          <div class="s3-text">
+            <h4>El modelo genera predicciones</h4>
+            <p>Entrenado con datos reales, produce resultados objetivos: probabilidades, rangos, comparables históricos.</p>
+          </div>
+        </div>
+        <div class="s3-step">
+          <div class="s3-num">03</div>
+          <div class="s3-text">
+            <h4>El artículo se publica con respaldo</h4>
+            <p>No "creemos que X llegará al Top 10". Sino: "el modelo asigna un 78% de probabilidad a la primera ronda".</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="s3-right-card">
+      <div class="tag">Output del modelo</div>
+      <div class="h3" style="margin-bottom:1.5vh;">Ejemplo: Aday Mara</div>
+      <div class="s3-output">
+        <div class="s3-output-row">
+          <span class="lbl">RONDA PREDICHA</span>
+          <span class="val">Primera Ronda</span>
+        </div>
+        <div class="s3-output-row">
+          <span class="lbl">RANGO DE PICK</span>
+          <span class="val">1 – 10</span>
+        </div>
+        <div class="s3-output-row">
+          <span class="lbl">ARQUETIPO</span>
+          <span class="val">Pívot Moderno</span>
+        </div>
+        <div class="s3-output-row">
+          <span class="lbl">COMPARABLE</span>
+          <span class="val">K. Porzingis</span>
+        </div>
+      </div>
+      <p class="body" style="margin-top:1.5vh;font-size:clamp(10px,1vw,13px);">Predicción basada en 13 años de datos reales de la NCAA y mediciones físicas del Combine 2026.</p>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 4: NUESTRO PROYECTO ===== -->
+<div class="slide bg-dark" id="s4">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">El proyecto</div>
+      <div class="h1">EL DRAFT 2026<br>COMO CASO DE USO</div>
+    </div>
+  </div>
+  <div class="s4-layout">
+    <div>
+      <p class="body" style="margin-bottom:2vh;">Entrenamos el modelo con datos históricos de la NCAA (2009–2021) y mediciones físicas del NBA Draft Combine. El objetivo: predecir la posición en el Draft de cualquier jugador.</p>
+      <div class="s4-data">
+        <div class="s4-stat"><div class="n">61K</div><div class="l">Registros NCAA</div></div>
+        <div class="s4-stat"><div class="n">13</div><div class="l">Años de datos</div></div>
+        <div class="s4-stat"><div class="n">2.121</div><div class="l">Jugadores modelo</div></div>
+        <div class="s4-stat"><div class="n">37</div><div class="l">Features finales</div></div>
+      </div>
+      <div class="s4-pipeline" style="margin-top:2vh;">
+        <div class="ps"><div class="pn">NCAA</div><div class="pl">stats cancha</div></div>
+        <div class="pa">+</div>
+        <div class="ps"><div class="pn">Combine</div><div class="pl">datos físicos</div></div>
+        <div class="pa">→</div>
+        <div class="ps final"><div class="pn">Modelo</div><div class="pl">predicción</div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1.5vh;">
+      <div class="card">
+        <div class="tag">Tres predicciones por jugador</div>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:1vh;">
+          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--orange);font-family:'Oswald',sans-serif;font-size:18px;">01</span><span class="body"><span class="bold">Ronda</span> — ¿R1 / R2 / No drafteado?</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--orange);font-family:'Oswald',sans-serif;font-size:18px;">02</span><span class="body"><span class="bold">Rango de pick</span> — ¿En qué franja del 1–60?</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--orange);font-family:'Oswald',sans-serif;font-size:18px;">03</span><span class="body"><span class="bold">Arquetipo</span> — ¿A qué jugador histórico se parece?</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="tag">Tres españoles en el Draft 2026</div>
+        <p class="body" style="margin-top:0.8vh;">Aday Mara, Baba Miller y Sergio De Larrea son el caso de uso perfecto: jugadores reales, datos reales, predicciones verificables en junio de 2026.</p>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 5: CÓMO FUNCIONA ===== -->
+<div class="slide bg-mid" id="s5">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">Cómo funciona</div>
+      <div class="h1">TRES MODELOS,<br>UN RESULTADO</div>
+    </div>
+  </div>
+  <div class="s5-layout">
+    <div class="s5-model">
+      <div class="s5-num">01</div>
+      <h3>CLASIFICACIÓN<br>DE RONDA</h3>
+      <p>¿Primera ronda, segunda ronda o no drafteado? Entrenado con 13 años de datos NCAA + mediciones físicas del Combine.</p>
+      <div class="s5-example">R1 · R2 · ND</div>
+    </div>
+    <div class="s5-model">
+      <div class="s5-num">02</div>
+      <h3>RANGO<br>DE PICK</h3>
+      <p>Para los jugadores drafteados: ¿en qué franja caerán? Rangos de 10 picks cada uno a lo largo del draft.</p>
+      <div class="s5-example" style="color:var(--gold);">1-10 · 11-20 · 21-30...</div>
+    </div>
+    <div class="s5-model">
+      <div class="s5-num">03</div>
+      <h3>ARQUETIPO<br>Y COMPARABLE</h3>
+      <p>¿A qué perfil de jugador histórico se parece? No predice una carrera — identifica un estilo de juego comparable.</p>
+      <div class="s5-example" style="color:#60a5fa;">"Perfil tipo Porzingis"</div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 6: LOS TRES ESPAÑOLES ===== -->
+<div class="slide bg-dark" id="s6">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">Los protagonistas</div>
+      <div class="h1">TRES ESPAÑOLES<br>EN EL DRAFT 2026</div>
+    </div>
+  </div>
+  <div class="s6-players">
+    <!-- Aday Mara -->
+    <div class="s6-player">
+      <div class="s6-accent"></div>
+      <svg class="s6-silhouette" viewBox="0 0 120 200" width="80" height="133">
+        <ellipse cx="60" cy="22" rx="14" ry="15" fill="#f97316"/>
+        <path d="M38 37 Q60 30 82 37 L88 92 Q60 102 32 92 Z" fill="#f97316"/>
+        <path d="M38 44 L14 18 L6 8" stroke="#f97316" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <path d="M82 48 L98 72 L104 84" stroke="#f97316" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <path d="M46 91 L40 140 L36 190" stroke="#f97316" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <path d="M74 91 L80 140 L86 190" stroke="#f97316" stroke-width="11" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="s6-name">ADAY MARA</div>
+      <div class="s6-pos">Center · Michigan 🇪🇸 · 7'3"</div>
+      <div class="s6-stats">
+        <div class="s6-stat"><div class="k">PPG</div><div class="v">12.1</div></div>
+        <div class="s6-stat"><div class="k">RPG</div><div class="v">6.8</div></div>
+        <div class="s6-stat"><div class="k">BPG</div><div class="v">2.6</div></div>
+        <div class="s6-stat"><div class="k">BPM</div><div class="v">+11</div></div>
+      </div>
+      <div class="s6-comparable">Comparable histórico: <span>K. Porzingis</span></div>
+      <span class="s6-mock">MOCK DRAFT ~TOP 15</span>
+    </div>
+    <!-- Baba Miller -->
+    <div class="s6-player">
+      <div class="s6-accent"></div>
+      <svg class="s6-silhouette" viewBox="0 0 120 200" width="80" height="133">
+        <ellipse cx="62" cy="21" rx="13" ry="14" fill="#fbbf24"/>
+        <path d="M42 35 Q62 28 84 35 L88 88 Q62 97 40 88 Z" fill="#fbbf24"/>
+        <path d="M84 41 L100 20 L108 11" stroke="#fbbf24" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <circle cx="112" cy="7" r="11" fill="#fbbf24" opacity="0.7"/>
+        <path d="M42 41 L24 33 L17 28" stroke="#fbbf24" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <path d="M48 87 L40 136 L34 188" stroke="#fbbf24" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <path d="M76 87 L84 136 L90 188" stroke="#fbbf24" stroke-width="10" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="s6-name">BABA MILLER</div>
+      <div class="s6-pos">SF/PF · Cincinnati 🇪🇸 · 6'11"</div>
+      <div class="s6-stats">
+        <div class="s6-stat"><div class="k">PPG</div><div class="v">13.0</div></div>
+        <div class="s6-stat"><div class="k">RPG</div><div class="v">10.3</div></div>
+        <div class="s6-stat"><div class="k">APG</div><div class="v">3.7</div></div>
+        <div class="s6-stat"><div class="k">BPM</div><div class="v">+9.4</div></div>
+      </div>
+      <div class="s6-comparable">Comparable histórico: <span>por determinar</span></div>
+      <span class="s6-mock">MOCK DRAFT ~PICK 32</span>
+    </div>
+    <!-- Sergio De Larrea -->
+    <div class="s6-player">
+      <div class="s6-accent"></div>
+      <svg class="s6-silhouette" viewBox="0 0 120 200" width="80" height="133">
+        <ellipse cx="53" cy="22" rx="12" ry="13" fill="#60a5fa"/>
+        <path d="M34 35 Q53 28 74 35 L79 82 Q53 90 30 82 Z" fill="#60a5fa" transform="rotate(-5 53 58)"/>
+        <path d="M74 43 L90 64 L97 82" stroke="#60a5fa" stroke-width="8" stroke-linecap="round" fill="none"/>
+        <circle cx="100" cy="90" r="11" fill="#60a5fa" opacity="0.6"/>
+        <path d="M34 43 L16 54 L10 62" stroke="#60a5fa" stroke-width="7" stroke-linecap="round" fill="none"/>
+        <path d="M40 80 L28 124 L22 170 L18 196" stroke="#60a5fa" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <path d="M66 80 L78 120 L90 158 L98 190" stroke="#60a5fa" stroke-width="10" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="s6-name">SERGIO DE LARREA</div>
+      <div class="s6-pos">PG · Valencia Basket 🇪🇸 · 6'6"</div>
+      <div class="s6-stats">
+        <div class="s6-stat"><div class="k">ALT.</div><div class="v">198cm</div></div>
+        <div class="s6-stat"><div class="k">3P%</div><div class="v">43%</div></div>
+        <div class="s6-stat"><div class="k">PESO</div><div class="v">79kg</div></div>
+        <div class="s6-stat"><div class="k">ENV.</div><div class="v">202cm</div></div>
+      </div>
+      <div class="s6-comparable">Comparable histórico: <span>por determinar</span></div>
+      <span class="s6-mock">MOCK DRAFT ~PICK 40</span>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 7: EL PRODUCTO ===== -->
+<div class="slide bg-mid" id="s7">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">El producto final</div>
+      <div class="h1">UNA APP PARA<br>CUALQUIER JUGADOR</div>
+    </div>
+  </div>
+  <div class="s7-layout">
+    <div class="s7-app">
+      <div class="s7-app-bar">
+        <div class="s7-dot" style="background:#ff5f57;"></div>
+        <div class="s7-dot" style="background:#febc2e;"></div>
+        <div class="s7-dot" style="background:#28c840;"></div>
+        <span style="font-size:11px;color:var(--gray);margin-left:8px;font-family:'Oswald',sans-serif;letter-spacing:2px;">NBA DRAFT PREDICTOR</span>
+      </div>
+      <div class="s7-fields">
+        <div class="s7-field"><label>JUGADOR</label><span>Aday Mara</span></div>
+        <div class="s7-field"><label>POSICIÓN</label><span>Center</span></div>
+        <div class="s7-field"><label>PPG</label><span>12.1</span></div>
+        <div class="s7-field"><label>RPG</label><span>6.8</span></div>
+        <div class="s7-field"><label>BPM</label><span>+11.0</span></div>
+        <div class="s7-field"><label>ALTURA</label><span>221 cm</span></div>
+      </div>
+      <button class="s7-btn">▶ PREDECIR</button>
+      <div class="s7-results">
+        <div class="s7-result-row"><span class="rl">RONDA</span><span class="rv">Primera Ronda ✓</span></div>
+        <div class="s7-result-row"><span class="rl">RANGO DE PICK</span><span class="rv">1 – 10</span></div>
+        <div class="s7-result-row"><span class="rl">ARQUETIPO</span><span class="rv">Pívot Moderno</span></div>
+        <div class="s7-result-row"><span class="rl">COMPARABLE</span><span class="rv">K. Porzingis</span></div>
+      </div>
+    </div>
+    <div class="s7-features">
+      <div class="s7-feat">
+        <div class="s7-feat-icon">⚡</div>
+        <div class="s7-feat-text">
+          <h4>Cualquier jugador, en segundos</h4>
+          <p>Introduce las estadísticas de cualquier prospecto del Draft y obtén las tres predicciones al instante.</p>
+        </div>
+      </div>
+      <div class="s7-feat">
+        <div class="s7-feat-icon">🔄</div>
+        <div class="s7-feat-text">
+          <h4>Reproducible cada año</h4>
+          <p>El modelo se puede reentrenar con nuevos datos. Válido para el Draft 2027, 2028 y siguientes.</p>
+        </div>
+      </div>
+      <div class="s7-feat">
+        <div class="s7-feat-icon">📰</div>
+        <div class="s7-feat-text">
+          <h4>Listo para publicar</h4>
+          <p>El output del modelo se traduce directamente en contenido periodístico verificable y diferencial.</p>
+        </div>
+      </div>
+      <div class="s7-feat">
+        <div class="s7-feat-icon">🌍</div>
+        <div class="s7-feat-text">
+          <h4>Escalable a otros deportes</h4>
+          <p>La metodología es extrapolable: mercado de fichajes en fútbol, draft de la NFL, rankings de tenis...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 8: POR QUÉ AHORA ===== -->
+<div class="slide bg-dark" id="s8">
+  <div class="trow">
+    <div class="abar" style="height:auto;min-height:60px;"></div>
+    <div>
+      <div class="tag">Por qué ahora</div>
+      <div class="h1">EL MOMENTO<br>ES AHORA</div>
+    </div>
+  </div>
+  <div class="s8-layout">
+    <div class="s8-reasons">
+      <div class="s8-reason">
+        <div class="s8-reason-icon">📈</div>
+        <div class="s8-reason-text">
+          <h4>El periodismo de datos está creciendo</h4>
+          <p>Los medios que integran datos e IA en su redacción crecen en audiencia joven. Es una ventana de oportunidad.</p>
+        </div>
+      </div>
+      <div class="s8-reason">
+        <div class="s8-reason-icon">🎯</div>
+        <div class="s8-reason-text">
+          <h4>Diferenciación editorial real</h4>
+          <p>El primer medio que publique predicciones de Draft respaldadas por ML marcará tendencia. Los demás copiarán.</p>
+        </div>
+      </div>
+      <div class="s8-reason">
+        <div class="s8-reason-icon">✅</div>
+        <div class="s8-reason-text">
+          <h4>Predicciones verificables en junio</h4>
+          <p>El Draft 2026 se celebra en junio. El modelo se puede validar públicamente contra los resultados reales.</p>
+        </div>
+      </div>
+      <div class="s8-reason">
+        <div class="s8-reason-icon">🇪🇸</div>
+        <div class="s8-reason-text">
+          <h4>El gancho perfecto: tres españoles</h4>
+          <p>Aday Mara, Baba Miller y Sergio De Larrea generan interés en medios españoles. El ángulo local potencia la historia.</p>
+        </div>
+      </div>
+    </div>
+    <div class="s8-right">
+      <div class="s8-stat-big">
+        <div class="n">3</div>
+        <div class="l">españoles con opciones reales<br>en el Draft 2026</div>
+      </div>
+      <div class="s8-stat-big">
+        <div class="n">13</div>
+        <div class="l">años de datos históricos<br>entrenando el modelo</div>
+      </div>
+      <div class="s8-stat-big">
+        <div class="n" style="font-size:clamp(32px,4.5vw,60px);">junio<br>2026</div>
+        <div class="l">resultados verificables<br>en tiempo real</div>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+<!-- ===== SLIDE 9: CIERRE ===== -->
+<div class="slide" id="s9">
+  <div class="s9-bg"></div>
+  <div class="s9-deco"><div class="s9-deco-txt">NBA</div></div>
+  <div class="s9-content">
+    <div class="s9-pretitle">El periodismo que viene</div>
+    <div class="s9-title">
+      ¿LISTO PARA<br>PUBLICAR ALGO<br><em>DIFERENTE?</em>
+    </div>
+    <div class="s9-line"></div>
+    <div class="s9-sub">Machine Learning aplicado al periodismo deportivo. Predicciones objetivas, metodología clara, contenido verificable.</div>
+    <div class="s9-footer">
+      <h3>ROBERTO CANTERO</h3>
+      <p>The Bridge · Data Science Bootcamp · 2026</p>
+      <div class="s9-tags">
+        <span class="s9-tag">Machine Learning</span>
+        <span class="s9-tag">Periodismo de Datos</span>
+        <span class="s9-tag">NBA Draft 2026</span>
+        <span class="s9-tag">Escalable</span>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT 2026</div>
+</div>
+
+</div><!-- #deck -->
+
+<div id="nav">
+  <button class="nbtn" onclick="prev()">&#8592;</button>
+  <div id="dots"></div>
+  <span id="ctr">1 / 10</span>
+  <button class="nbtn" onclick="next()">&#8594;</button>
+  <button id="fsb" onclick="toggleFS()">&#x26F6;</button>
+</div>
+
+<script>
+const TOTAL = 10;
+let cur = 0, animating = false;
+const slides = document.querySelectorAll('.slide');
+const dotsEl = document.getElementById('dots');
+const ctr    = document.getElementById('ctr');
+const prog   = document.getElementById('progress');
+
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i===0?' on':'');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function updateUI() {
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('on', i===cur));
+  ctr.textContent = `${cur+1} / ${TOTAL}`;
+  prog.style.width = `${((cur+1)/TOTAL)*100}%`;
+}
+
+function goTo(idx) {
+  if (animating || idx === cur || idx < 0 || idx >= TOTAL) return;
+  animating = true;
+  const from = slides[cur], to = slides[idx];
+  const right = idx > cur;
+  from.classList.add('exit');
+  to.style.transform = `translateX(${right?'60px':'-60px'})`;
+  to.style.opacity = '0';
+  to.classList.add('active');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    to.style.transition = 'opacity .45s ease, transform .45s ease';
+    to.style.transform = 'translateX(0)';
+    to.style.opacity = '1';
+  }));
+  setTimeout(() => {
+    from.classList.remove('active','exit');
+    from.style.transform = from.style.opacity = '';
+    to.style.transition = '';
+    cur = idx; updateUI(); animating = false;
+  }, 480);
+}
+
+function next() { goTo(cur+1); }
+function prev() { goTo(cur-1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key==='ArrowRight'||e.key===' ') { e.preventDefault(); next(); }
+  if (e.key==='ArrowLeft')               { e.preventDefault(); prev(); }
+  if (e.key==='f'||e.key==='F')          toggleFS();
+});
+
+let tx = 0;
+document.addEventListener('touchstart', e => tx=e.touches[0].clientX, {passive:true});
+document.addEventListener('touchend',   e => { const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>50) dx<0?next():prev(); }, {passive:true});
+
+function toggleFS() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+
+updateUI();
+</script>
+</body>
+</html>
