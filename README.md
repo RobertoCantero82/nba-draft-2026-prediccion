@@ -1,6 +1,6 @@
 <div align="center">
 
-![RC — NBA Draft 2026 ML Predictor](logo.svg)
+![RC — NBA Draft 2026 ML Predictor](logo.gif)
 
 </div>
 
