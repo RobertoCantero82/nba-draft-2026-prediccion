@@ -1,6 +1,6 @@
 <div align="center">
 
-![RC — NBA Draft 2026 ML Predictor](docs/logo.svg)
+![RC — NBA Draft 2026 ML Predictor](logo.svg)
 
 </div>
 
@@ -100,7 +100,7 @@ nba-draft-2026-prediccion/
 
 ---
 
-## 🛠️ Stack
+## 🛠️ Tecnologías utilizadas
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white)
