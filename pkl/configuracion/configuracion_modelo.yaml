@@ -1,0 +1,114 @@
+# ============================================================
+# Configuración del modelo final — NBA Draft 2026 Predicción
+# ============================================================
+# Proyecto: Predicción de drafteado y rango de elección
+#           para jugadores españoles en el Draft NBA 2026
+# Autor: Roberto Cantero
+# Fecha: Junio 2026
+# ============================================================
+
+# --- Modelo principal: predicción de ronda (ND / R1 / R2) ---
+modelo_ronda:
+  algoritmo: XGBClassifier
+  archivo: xgb_draft_randsearch.pkl
+  target: ronda
+  clases: [ND, R1, R2]
+  metrica_seleccion: macro_f1
+  macro_f1_test: 0.6110
+  auc_macro_test: 0.8558
+
+  hiperparametros:
+    objective: multi:softmax
+    num_class: 3
+    n_estimators: 200
+    max_depth: 3
+    learning_rate: 0.01
+    subsample: 1.0
+    colsample_bytree: 1.0
+    min_child_weight: 1
+    gamma: 0.5
+    eval_metric: mlogloss
+    random_state: 11
+
+  preprocesado:
+    encoding_posicion: one_hot (drop_first=False)
+    balanceo_clases: compute_sample_weight(balanced)
+    label_encoder: le_target_draft.pkl
+
+  split:
+    test_size: 0.15
+    stratify: true
+    random_state: 11
+
+  busqueda_hiperparametros:
+    metodo: RandomizedSearchCV
+    n_iter: 50
+    cv: StratifiedKFold(n_splits=5)
+    scoring: f1_macro
+
+# --- Modelo secundario: predicción de rango de pick (1-10 ... 51-60 / ND) ---
+modelo_rango:
+  algoritmo: XGBClassifier
+  archivo: xgb_rango_randsearch.pkl
+  target: rango_pick
+  clases: [1-10, 11-20, 21-30, 31-40, 41-50, 51-60, ND]
+  metrica_seleccion: macro_f1
+  nota: >
+    El rango exacto tiene un techo bajo (~0.24 macro F1) con estadísticas
+    NCAA únicamente. Se usa como orientación secundaria, no como predicción
+    principal. Ver notebook segundo_modelo_eleccion.ipynb para análisis completo.
+
+  hiperparametros:
+    objective: multi:softmax
+    num_class: 7
+    eval_metric: mlogloss
+    random_state: 11
+
+  busqueda_hiperparametros:
+    metodo: RandomizedSearchCV
+    n_iter: 50
+    cv: StratifiedKFold(n_splits=5)
+    scoring: f1_macro
+
+# --- Modelo no supervisado: arquetipos de jugador ---
+modelo_arquetipos:
+  algoritmo: KMeans
+  archivo: kmeans_arquetipos.pkl
+  input: combine_final.csv (medidas físicas del NBA Combine)
+  n_clusters: 5
+  descripcion: >
+    Clustering de arquetipos físicos basado en medidas del combine
+    (altura, envergadura, peso, velocidad, salto). Usado para
+    identificar el arquetipo de cada prospecto español y sus
+    comparables históricos por distancia euclidiana.
+
+# --- Dataset de entrenamiento ---
+datos:
+  fuente_principal: ncaa_final.csv
+  registros: 2121
+  variables: 35
+  periodo: temporadas NCAA 2009-2021
+  targets:
+    - ronda: [ND, R1, R2]
+    - rango_pick: [1-10, 11-20, 21-30, 31-40, 41-50, 51-60, ND]
+  desbalanceo:
+    ND: 70.7%
+    R1: 15.2%
+    R2: 14.1%
+
+# --- Prospectos españoles evaluados ---
+prospectos:
+  - nombre: Aday Mara
+    posicion: C
+    liga: ACB
+    mock_draft_referencia: ~pick 9 (top 10)
+
+  - nombre: Baba Miller
+    posicion: PF/SF
+    liga: NCAA
+    mock_draft_referencia: ~pick 45 (segunda ronda)
+
+  - nombre: Sergio de Larrea
+    posicion: PG
+    liga: EuroLeague / Valencia Basket
+    mock_draft_referencia: ~pick 40 (alta varianza, rango 28-58)
