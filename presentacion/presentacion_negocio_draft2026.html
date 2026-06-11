@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NBA Draft Predictor · Pitch para Medios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',sans-serif;}
+
+:root{
+  --orange:#f97316;
+  --orange-soft:#fb923c;
+  --gold:#fbbf24;
+  --blue:#60a5fa;
+  --red:#f87171;
+  --green:#34d399;
+  --white:#f0f4ff;
+  --gray:#8c96a8;
+  --ink:#05080e;
+  --ink2:#0a1019;
+  --panel:rgba(14,22,36,0.72);
+  --os:'Oswald',sans-serif;
+  --ui:'Inter',sans-serif;
+}
+
+.deck-stage{width:100vw;height:100vh;position:relative;background:#000;}
+
+.frame{
+  position:absolute;inset:0;
+  background:var(--ink);
+  font-family:var(--ui);color:var(--white);
+  padding:88px 110px 80px;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.frame::before{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,0.015) 0,rgba(255,255,255,0.015) 1px,transparent 1px,transparent 240px);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 25%,#000 75%,transparent);
+          mask-image:linear-gradient(180deg,transparent,#000 25%,#000 75%,transparent);
+}
+.frame::after{
+  content:"";position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(130% 90% at 85% 10%, rgba(249,115,22,0.10), transparent 55%),
+    linear-gradient(180deg, rgba(5,8,14,0.50), rgba(5,8,14,0.88));
+}
+.frame>*{position:relative;z-index:2;}
+
+.frame.cover{padding:0;align-items:center;justify-content:center;text-align:center;}
+
+/* BROADCAST CHROME */
+.scorebug{
+  position:absolute;top:38px;left:110px;z-index:5;
+  display:flex;align-items:stretch;height:44px;font-family:var(--os);
+}
+.scorebug .tab{
+  background:var(--orange);color:#0a0a0a;font-weight:700;
+  letter-spacing:2px;font-size:19px;white-space:nowrap;
+  display:flex;align-items:center;padding:0 16px;
+  clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);
+}
+.scorebug .meta{
+  background:rgba(8,12,20,0.85);border:1px solid rgba(255,255,255,0.08);border-left:none;
+  color:var(--white);letter-spacing:3px;font-size:14px;font-weight:500;white-space:nowrap;
+  display:flex;align-items:center;gap:10px;padding:0 20px 0 18px;
+  clip-path:polygon(12px 0,100% 0,100% 100%,0 100%);margin-left:-10px;
+}
+.live{display:inline-flex;align-items:center;gap:8px;}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);}
+
+.slideno{
+  position:absolute;top:42px;right:110px;z-index:5;
+  font-family:var(--os);font-size:17px;letter-spacing:4px;color:rgba(255,255,255,0.32);
+}
+.slideno b{color:var(--orange);font-size:21px;}
+
+.wm{
+  position:absolute;bottom:36px;right:110px;z-index:5;
+  font-family:var(--os);font-size:13px;letter-spacing:7px;color:rgba(255,255,255,0.12);
+}
+
+/* TYPE */
+.kicker{font-family:var(--os);font-weight:600;letter-spacing:6px;text-transform:uppercase;font-size:21px;color:var(--orange);}
+.title-row{display:flex;align-items:flex-start;gap:24px;margin-bottom:28px;}
+.abar{width:9px;border-radius:3px;background:var(--orange);align-self:stretch;flex-shrink:0;}
+.h1{font-family:var(--os);font-weight:700;font-size:80px;line-height:0.88;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+.h1 .o{color:var(--orange);}
+.body{font-family:var(--ui);font-size:26px;line-height:1.62;color:rgba(240,244,255,0.72);}
+.body b,.body .w{color:var(--white);font-weight:600;}
+.body .o{color:var(--orange);font-weight:600;}
+
+.card{background:var(--panel);border:1px solid rgba(255,255,255,0.07);border-radius:14px;backdrop-filter:blur(8px);}
+.hdiv{width:100%;height:1px;background:rgba(249,115,22,0.20);margin:18px 0;}
+.tech-chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--os);font-size:15px;letter-spacing:1px;background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.28);border-radius:8px;color:var(--orange-soft);padding:5px 12px;}
+
+/* NAV */
+.nav{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:100;
+  display:flex;align-items:center;gap:12px;
+  background:rgba(8,12,20,0.90);border:1px solid rgba(255,255,255,0.10);border-radius:40px;
+  padding:10px 20px;backdrop-filter:blur(12px);
+}
+.nav-btn{font-family:var(--os);font-weight:600;font-size:15px;letter-spacing:2px;color:var(--gray);background:none;border:none;cursor:pointer;padding:6px 14px;border-radius:24px;transition:all .2s;}
+.nav-btn:hover{color:var(--orange);background:rgba(249,115,22,0.12);}
+.nav-dots{display:flex;gap:7px;align-items:center;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.18);cursor:pointer;transition:all .2s;}
+.nav-dot.active{background:var(--orange);width:22px;border-radius:4px;}
+
+.slide{display:none;}
+.slide.active{display:block;}
+
+/* BIG STAT */
+.bigstat{font-family:var(--os);font-weight:700;font-size:90px;line-height:0.88;color:var(--orange);}
+.bigstat-lbl{font-family:var(--os);letter-spacing:4px;font-size:16px;color:var(--gray);text-transform:uppercase;margin-top:6px;}
+
+/* PAIN CARD */
+.pain-card{
+  flex:1;padding:26px 22px;
+  background:var(--panel);border:1px solid rgba(255,255,255,0.07);border-radius:14px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.pain-card .pc-icon{font-size:32px;margin-bottom:4px;}
+.pain-card .pc-title{font-family:var(--os);font-weight:700;font-size:22px;letter-spacing:1px;color:var(--white);}
+.pain-card .pc-body{font-family:var(--ui);font-size:18px;line-height:1.55;color:rgba(240,244,255,0.65);}
+
+/* FEATURE CARD */
+.feat-card{
+  padding:22px 20px;
+  background:var(--panel);border:1px solid rgba(255,255,255,0.07);border-radius:14px;
+  display:flex;gap:18px;align-items:flex-start;
+}
+.feat-card .fc-num{
+  font-family:var(--os);font-weight:700;font-size:36px;color:var(--orange);line-height:1;
+  min-width:44px;
+}
+.feat-card .fc-content{}
+.feat-card .fc-title{font-family:var(--os);font-weight:700;font-size:21px;letter-spacing:1px;color:var(--white);margin-bottom:4px;}
+.feat-card .fc-body{font-family:var(--ui);font-size:18px;color:rgba(240,244,255,0.65);line-height:1.5;}
+
+/* ROI CARD */
+.roi-card{
+  flex:1;padding:24px 20px;text-align:center;
+  background:var(--panel);border:1px solid rgba(255,255,255,0.07);border-radius:14px;
+}
+.roi-card .roi-val{font-family:var(--os);font-weight:700;font-size:52px;color:var(--orange);line-height:1;}
+.roi-card .roi-lbl{font-family:var(--os);letter-spacing:3px;font-size:14px;color:var(--gray);text-transform:uppercase;margin-top:6px;}
+.roi-card .roi-body{font-family:var(--ui);font-size:17px;color:rgba(240,244,255,0.60);margin-top:8px;line-height:1.45;}
+
+/* DEMO MOCKUP */
+.app-mockup{
+  flex:1;border-radius:14px;border:1px solid rgba(249,115,22,0.30);
+  background:rgba(8,12,20,0.80);overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.app-mockup .app-header{
+  background:rgba(249,115,22,0.12);border-bottom:1px solid rgba(249,115,22,0.20);
+  padding:12px 18px;display:flex;align-items:center;gap:12px;
+}
+.app-mockup .app-tab{
+  font-family:var(--os);font-size:14px;letter-spacing:2px;text-transform:uppercase;
+  padding:6px 14px;border-radius:6px;cursor:pointer;color:var(--gray);
+}
+.app-mockup .app-tab.active{background:var(--orange);color:#0a0a0a;font-weight:700;}
+.app-mockup .app-body{flex:1;padding:20px 18px;display:flex;flex-direction:column;gap:14px;}
+.radar-placeholder{
+  flex:1;border-radius:10px;border:1px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+/* Fake radar chart */
+.radar-placeholder svg{opacity:.85;}
+</style>
+</head>
+<body>
+<div class="deck-stage">
+
+<!-- ======= SLIDE 1 · PORTADA ======= -->
+<div class="slide active" id="s1">
+<div class="frame cover">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:0;z-index:2;position:relative;">
+    <div class="kicker" style="margin-bottom:20px;">Propuesta para medios deportivos · 2026</div>
+    <div style="font-family:var(--os);font-weight:700;font-size:110px;line-height:0.85;text-transform:uppercase;letter-spacing:-2px;margin-bottom:10px;">
+      <span style="display:block;">Draft</span>
+      <span style="color:var(--orange);">Predictor</span>
+    </div>
+    <div style="width:400px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--orange),var(--gold),transparent);margin:28px auto 26px;"></div>
+    <div class="body" style="font-size:28px;max-width:740px;opacity:.85;">
+      La herramienta de <b>Machine Learning</b> que convierte el análisis del NBA Draft en contenido interactivo para tus lectores
+    </div>
+    <div style="margin-top:30px;display:flex;gap:16px;align-items:center;">
+      <div style="font-family:var(--os);font-size:14px;letter-spacing:4px;color:var(--gray);text-transform:uppercase;">Disponible para:</div>
+      <span class="tech-chip">Medios deportivos</span>
+      <span class="tech-chip">Portales NBA</span>
+      <span class="tech-chip">Plataformas digitales</span>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+<!-- ======= SLIDE 2 · EL PROBLEMA ======= -->
+<div class="slide" id="s2">
+<div class="frame">
+  <div style="position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px);-webkit-mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);"></div>
+  <div class="scorebug"><div class="tab">EL RETO</div><div class="meta">EL PROBLEMA DE HOY</div></div>
+  <div class="slideno"><b>02</b> / 07</div>
+
+  <div class="title-row" style="margin-top:34px;">
+    <div class="abar"></div>
+    <div class="h1">El mercado <span class="o">te pide más</span></div>
+  </div>
+
+  <div style="display:flex;gap:20px;flex:1;align-items:stretch;margin-top:4px;">
+    <div class="pain-card">
+      <div class="pc-icon">📊</div>
+      <div class="pc-title">Cobertura reactiva</div>
+      <div class="pc-body">Los medios publican <b>después del draft</b>. Los lectores ya lo saben. No hay ventaja editorial.</div>
+    </div>
+    <div class="pain-card" style="border-color:rgba(249,115,22,0.25);">
+      <div class="pc-icon">🏀</div>
+      <div class="pc-title">Falta de datos propios</div>
+      <div class="pc-body">El análisis del draft se limita a <b>transcribir mocks</b> de ESPN o NBA.com. Cero diferenciación.</div>
+    </div>
+    <div class="pain-card">
+      <div class="pc-icon">👀</div>
+      <div class="pc-title">El lector quiere interacción</div>
+      <div class="pc-body">El consumo de contenido NBA en España ha crecido un <b>340% desde 2019</b>. El formato texto se queda corto.</div>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+<!-- ======= SLIDE 3 · LA SOLUCIÓN ======= -->
+<div class="slide" id="s3">
+<div class="frame">
+  <div style="position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px);-webkit-mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);"></div>
+  <div class="scorebug"><div class="tab">SOLUCIÓN</div><div class="meta">DRAFT PREDICTOR APP</div></div>
+  <div class="slideno"><b>03</b> / 07</div>
+
+  <div class="title-row" style="margin-top:34px;">
+    <div class="abar"></div>
+    <div class="h1">La <span class="o">herramienta</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1.1fr;gap:50px;flex:1;align-items:stretch;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div class="feat-card">
+        <div class="fc-num">01</div>
+        <div class="fc-content">
+          <div class="fc-title">Predicción en tiempo real</div>
+          <div class="fc-body">Introduce las estadísticas de cualquier jugador y obtén su probabilidad de ser drafteado, ronda y rango de pick.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-num">02</div>
+        <div class="fc-content">
+          <div class="fc-title">Perfil físico / arquetipo</div>
+          <div class="fc-body">Spider chart interactivo comparado con su NBA comparable más cercano. Explicación en lenguaje humano.</div>
+        </div>
+      </div>
+      <div class="feat-card">
+        <div class="fc-num">03</div>
+        <div class="fc-content">
+          <div class="fc-title">Enfoque en españoles</div>
+          <div class="fc-body">Aday Mara, Baba Miller y Sergio de Larrea ya están precargados. Contenido inmediato para el lector español.</div>
+        </div>
+      </div>
+      <div class="feat-card" style="border-color:rgba(249,115,22,0.30);">
+        <div class="fc-num" style="color:var(--gold);">04</div>
+        <div class="fc-content">
+          <div class="fc-title">Integrable en tu web</div>
+          <div class="fc-body">Embed vía iframe o API. Diseño adaptable a la identidad de tu medio. Sin fricción técnica.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- App mockup -->
+    <div class="app-mockup">
+      <div class="app-header">
+        <div style="font-family:var(--os);font-weight:700;font-size:16px;letter-spacing:2px;color:var(--orange);">▶ DRAFT PREDICTOR 2026</div>
+        <div style="flex:1;"></div>
+        <div class="app-tab active">ESPAÑOLES</div>
+        <div class="app-tab">MOCK DRAFT</div>
+        <div class="app-tab">¿CÓMO FUNCIONA?</div>
+      </div>
+      <div class="app-body">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;padding:14px;background:rgba(249,115,22,0.10);border:1px solid rgba(249,115,22,0.30);border-radius:10px;cursor:pointer;">
+            <div style="font-family:var(--os);font-weight:700;font-size:18px;color:var(--orange);">ADAY MARA</div>
+            <div style="font-family:var(--os);font-size:12px;letter-spacing:2px;color:var(--gray);">C · BARCELONA</div>
+          </div>
+          <div style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;cursor:pointer;">
+            <div style="font-family:var(--os);font-weight:700;font-size:18px;">BABA MILLER</div>
+            <div style="font-family:var(--os);font-size:12px;letter-spacing:2px;color:var(--gray);">PF · NCAA</div>
+          </div>
+          <div style="flex:1;padding:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;cursor:pointer;">
+            <div style="font-family:var(--os);font-weight:700;font-size:15px;">S. DE LARREA</div>
+            <div style="font-family:var(--os);font-size:12px;letter-spacing:2px;color:var(--gray);">PG · EUROLEAGUE</div>
+          </div>
+        </div>
+        <div class="radar-placeholder" style="min-height:160px;">
+          <svg viewBox="0 0 200 160" width="200" height="160">
+            <!-- Radar background -->
+            <polygon points="100,20 160,55 160,105 100,140 40,105 40,55" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+            <polygon points="100,40 145,65 145,95 100,120 55,95 55,65" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <polygon points="100,60 130,75 130,85 100,100 70,85 70,75" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <!-- Axes -->
+            <line x1="100" y1="20" x2="100" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="100" y1="80" x2="160" y2="55" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="100" y1="80" x2="160" y2="105" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="100" y1="80" x2="100" y2="140" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="100" y1="80" x2="40" y2="105" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="100" y1="80" x2="40" y2="55" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <!-- Player data -->
+            <polygon points="100,28 152,60 155,100 100,130 46,102 44,58" fill="rgba(249,115,22,0.18)" stroke="#f97316" stroke-width="2"/>
+            <!-- Labels -->
+            <text x="100" y="15" text-anchor="middle" font-family="Oswald" font-size="9" fill="rgba(240,244,255,0.5)" letter-spacing="1">ALTURA</text>
+            <text x="167" y="58" text-anchor="start" font-family="Oswald" font-size="9" fill="rgba(240,244,255,0.5)" letter-spacing="1">ENVERGA.</text>
+            <text x="167" y="108" text-anchor="start" font-family="Oswald" font-size="9" fill="rgba(240,244,255,0.5)" letter-spacing="1">PESO</text>
+            <text x="100" y="153" text-anchor="middle" font-family="Oswald" font-size="9" fill="rgba(240,244,255,0.5)" letter-spacing="1">SALTO</text>
+            <text x="33" y="108" text-anchor="end" font-family="Oswald" font-size="9" fill="rgba(240,244,255,0.5)" letter-spacing="1">SPRINT</text>
+            <text x="33" y="58" text-anchor="end" font-family="Oswald" font-size="9" fill="rgba(240,244,255,0.5)" letter-spacing="1">AGILIDAD</text>
+          </svg>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;padding:10px 12px;background:rgba(249,115,22,0.10);border-radius:8px;text-align:center;">
+            <div style="font-family:var(--os);font-weight:700;font-size:26px;color:var(--orange);">95.5%</div>
+            <div style="font-family:var(--os);font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;">P(draft)</div>
+          </div>
+          <div style="flex:1;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:8px;text-align:center;">
+            <div style="font-family:var(--os);font-weight:700;font-size:26px;color:var(--white);">41-50</div>
+            <div style="font-family:var(--os);font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;">Pick modelo</div>
+          </div>
+          <div style="flex:1;padding:10px 12px;background:rgba(255,255,255,0.04);border-radius:8px;text-align:center;">
+            <div style="font-family:var(--os);font-weight:700;font-size:18px;color:var(--green);">Pívot élite</div>
+            <div style="font-family:var(--os);font-size:11px;letter-spacing:2px;color:var(--gray);text-transform:uppercase;">Arquetipo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+<!-- ======= SLIDE 4 · DEMO (pantalla en blanco para mostrar app) ======= -->
+<div class="slide" id="s4">
+<div class="frame" style="align-items:center;justify-content:center;">
+  <div style="position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px);-webkit-mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);"></div>
+  <div class="scorebug"><div class="tab">EN VIVO</div><div class="meta"><span class="live">DEMO · DRAFT PREDICTOR</span></div></div>
+  <div class="slideno"><b>04</b> / 07</div>
+
+  <div style="z-index:2;position:relative;display:flex;flex-direction:column;align-items:center;gap:28px;text-align:center;">
+    <div style="font-family:var(--os);font-weight:700;font-size:96px;line-height:0.88;text-transform:uppercase;">
+      <span style="display:block;color:rgba(240,244,255,0.4);">Momento</span>
+      <span style="color:var(--orange);">demo</span>
+    </div>
+    <div style="width:350px;height:4px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--orange),var(--gold),transparent);"></div>
+    <div class="body" style="font-size:26px;max-width:700px;opacity:.8;">
+      Abre la app en vivo y muestra cómo funciona con <b>Aday Mara</b>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;justify-content:center;">
+      <div class="card" style="padding:16px 24px;">
+        <div style="font-family:var(--os);font-size:13px;letter-spacing:3px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">Tab 1</div>
+        <div style="font-family:var(--os);font-weight:700;font-size:18px;color:var(--orange);">Españoles 2026</div>
+        <div style="font-family:var(--ui);font-size:15px;color:rgba(240,244,255,0.55);margin-top:4px;">Aday · Baba · Larrea + radar + comparable</div>
+      </div>
+      <div class="card" style="padding:16px 24px;">
+        <div style="font-family:var(--os);font-size:13px;letter-spacing:3px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">Tab 2</div>
+        <div style="font-family:var(--os);font-weight:700;font-size:18px;color:var(--white);">Mock Draft</div>
+        <div style="font-family:var(--ui);font-size:15px;color:rgba(240,244,255,0.55);margin-top:4px;">Cualquier jugador · 6 stats básicas</div>
+      </div>
+      <div class="card" style="padding:16px 24px;">
+        <div style="font-family:var(--os);font-size:13px;letter-spacing:3px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">Tab 3</div>
+        <div style="font-family:var(--os);font-weight:700;font-size:18px;color:var(--white);">¿Cómo funciona?</div>
+        <div style="font-family:var(--ui);font-size:15px;color:rgba(240,244,255,0.55);margin-top:4px;">Explicación periodística del modelo</div>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+<!-- ======= SLIDE 5 · VALOR EDITORIAL ======= -->
+<div class="slide" id="s5">
+<div class="frame">
+  <div style="position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px);-webkit-mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);"></div>
+  <div class="scorebug"><div class="tab">PROPUESTA</div><div class="meta">VALOR PARA TU MEDIO</div></div>
+  <div class="slideno"><b>05</b> / 07</div>
+
+  <div class="title-row" style="margin-top:34px;">
+    <div class="abar"></div>
+    <div class="h1">¿Qué ganas <span class="o">tú?</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1;align-items:stretch;margin-top:4px;">
+    <div class="roi-card" style="border-color:rgba(249,115,22,0.30);">
+      <div class="roi-val">+4h</div>
+      <div class="roi-lbl">Antes del resto</div>
+      <div class="roi-body">Tus lectores ven las predicciones <b>antes del draft real</b>. Tú generas la noticia, no la copias.</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-val" style="color:var(--green);">×3</div>
+      <div class="roi-lbl">Engagement estimado</div>
+      <div class="roi-body">El contenido interactivo retiene al lector <b>3 veces más</b> que un artículo estático sobre el mismo tema.</div>
+    </div>
+    <div class="roi-card">
+      <div class="roi-val" style="color:var(--blue);">100%</div>
+      <div class="roi-lbl">Exclusivo</div>
+      <div class="roi-body">Ningún medio español tiene hoy una herramienta de predicción de draft con ML. <b>Serías el primero.</b></div>
+    </div>
+    <div class="roi-card" style="border-color:rgba(251,191,36,0.25);">
+      <div class="roi-val" style="color:var(--gold);">+26 jun</div>
+      <div class="roi-lbl">Contenido vivo</div>
+      <div class="roi-body">El <b>26 de junio</b> llega el draft real. El modelo se puede evaluar en directo: <b>¿acertó la IA?</b> Otra historia.</div>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+<!-- ======= SLIDE 6 · LA PERSONA ======= -->
+<div class="slide" id="s6">
+<div class="frame">
+  <div style="position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px);-webkit-mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);"></div>
+  <div class="scorebug"><div class="tab">EQUIPO</div><div class="meta">QUIÉN HAY DETRÁS</div></div>
+  <div class="slideno"><b>06</b> / 07</div>
+
+  <div class="title-row" style="margin-top:34px;">
+    <div class="abar"></div>
+    <div class="h1">El perfil <span class="o">único</span></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:50px;flex:1;align-items:center;">
+    <div style="display:flex;flex-direction:column;gap:18px;">
+      <div class="body" style="font-size:22px;">
+        Esta herramienta la ha construido alguien que <b>entiende los dos mundos</b>: el del periodismo y el de los datos.
+      </div>
+      <div class="hdiv"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(249,115,22,0.15);border:1px solid rgba(249,115,22,0.35);display:flex;align-items:center;justify-content:center;font-family:var(--os);font-weight:700;font-size:16px;color:var(--orange);flex-shrink:0;">📰</div>
+          <div class="body" style="font-size:20px;"><b>9 años</b> cubriendo tecnología y ciencia para Difoosion (Xataka, Hipertextual…)</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.25);display:flex;align-items:center;justify-content:center;font-family:var(--os);font-weight:700;font-size:16px;color:var(--blue);flex-shrink:0;">📊</div>
+          <div class="body" style="font-size:20px;"><b>Data Science</b> · The Bridge 2026 · ML, Python, visualización</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start;">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.20);display:flex;align-items:center;justify-content:center;font-family:var(--os);font-weight:700;font-size:16px;color:var(--green);flex-shrink:0;">🏀</div>
+          <div class="body" style="font-size:20px;"><b>Seguidor activo</b> del basket nacional e internacional. Baskonia · NBA</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="font-family:var(--os);font-size:13px;letter-spacing:4px;color:var(--gray);text-transform:uppercase;margin-bottom:4px;">Qué puedo ofrecerte</div>
+      <div class="feat-card" style="flex:none;">
+        <div style="font-family:var(--os);font-size:28px;color:var(--orange);min-width:36px;">→</div>
+        <div class="fc-content">
+          <div class="fc-title">Embed de la app</div>
+          <div class="fc-body">Integración iframe en tu web con diseño adaptado a tu marca.</div>
+        </div>
+      </div>
+      <div class="feat-card" style="flex:none;">
+        <div style="font-family:var(--os);font-size:28px;color:var(--orange);min-width:36px;">→</div>
+        <div class="fc-content">
+          <div class="fc-title">Artículo de análisis</div>
+          <div class="fc-body">Pieza explicativa sobre el draft español, con datos propios y narrativa periodística.</div>
+        </div>
+      </div>
+      <div class="feat-card" style="flex:none;border-color:rgba(249,115,22,0.30);">
+        <div style="font-family:var(--os);font-size:28px;color:var(--gold);min-width:36px;">→</div>
+        <div class="fc-content">
+          <div class="fc-title">Post-draft: ¿acertó la IA?</div>
+          <div class="fc-body">Segunda pieza el 27 de junio evaluando las predicciones en tiempo real.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+<!-- ======= SLIDE 7 · CIERRE ======= -->
+<div class="slide" id="s7">
+<div class="frame" style="align-items:center;justify-content:center;text-align:center;">
+  <div style="position:absolute;inset:0;z-index:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 240px);-webkit-mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);mask-image:linear-gradient(180deg,transparent,#000 20%,#000 80%,transparent);"></div>
+  <div class="scorebug"><div class="tab">ACCIÓN</div><div class="meta"><span class="live">TU TURNO</span></div></div>
+  <div class="slideno"><b>07</b> / 07</div>
+
+  <div style="z-index:2;position:relative;display:flex;flex-direction:column;align-items:center;gap:22px;">
+    <div style="font-family:var(--os);font-weight:700;font-size:26px;letter-spacing:6px;color:var(--gray);text-transform:uppercase;">Draft: 26 junio 2026</div>
+    <div style="font-family:var(--os);font-weight:700;font-size:96px;line-height:0.85;text-transform:uppercase;letter-spacing:-2px;">
+      <span style="display:block;">Sé el</span>
+      <span style="color:var(--orange);">primero.</span>
+    </div>
+    <div style="width:320px;height:4px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--orange),var(--gold),transparent);"></div>
+    <div class="body" style="font-size:24px;max-width:680px;opacity:.8;">
+      Si tu medio quiere ser el primero en España en analizar el draft con IA, <b>hablemos antes del 20 de junio.</b>
+    </div>
+    <div style="display:flex;gap:20px;margin-top:10px;">
+      <div class="card" style="padding:18px 28px;">
+        <div style="font-family:var(--os);font-size:13px;letter-spacing:3px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">Contacto</div>
+        <div style="font-family:var(--os);font-weight:700;font-size:22px;color:var(--white);">Roberto Cantero</div>
+        <div style="font-family:var(--ui);font-size:16px;color:var(--orange-soft);margin-top:4px;">Periodista · Data Scientist</div>
+      </div>
+      <div class="card" style="padding:18px 28px;">
+        <div style="font-family:var(--os);font-size:13px;letter-spacing:3px;color:var(--gray);text-transform:uppercase;margin-bottom:6px;">GitHub</div>
+        <div style="font-family:var(--os);font-weight:700;font-size:16px;color:var(--white);">RobertoCantero82</div>
+        <div style="font-family:var(--ui);font-size:14px;color:rgba(240,244,255,0.45);margin-top:4px;">nba-draft-2026-prediccion</div>
+      </div>
+    </div>
+  </div>
+  <div class="wm">DRAFT PREDICTOR · RCB · 2026</div>
+</div>
+</div>
+
+</div><!-- /deck-stage -->
+
+<div class="nav">
+  <button class="nav-btn" onclick="changeSlide(-1)">← PREV</button>
+  <div class="nav-dots" id="navDots"></div>
+  <button class="nav-btn" onclick="changeSlide(1)">NEXT →</button>
+</div>
+
+<script>
+const TOTAL = 7;
+let current = 1;
+function buildDots(){
+  const d = document.getElementById('navDots');
+  d.innerHTML = '';
+  for(let i=1;i<=TOTAL;i++){
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot' + (i===current?' active':'');
+    dot.onclick = ()=>goTo(i);
+    d.appendChild(dot);
+  }
+}
+function goTo(n){
+  document.getElementById('s'+current).classList.remove('active');
+  current = Math.max(1,Math.min(TOTAL,n));
+  document.getElementById('s'+current).classList.add('active');
+  buildDots();
+}
+function changeSlide(dir){ goTo(current+dir); }
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ') changeSlide(1);
+  if(e.key==='ArrowLeft') changeSlide(-1);
+});
+buildDots();
+</script>
+</body>
+</html>
