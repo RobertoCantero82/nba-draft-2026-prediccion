@@ -1,0 +1,93 @@
+NBA DRAFT 2026 — ESTRUCTURA DEL CODIGO
+=======================================
+
+En este archivo explico como organizo el codigo de la prediccion de los
+tres españoles. Lo divido en cuatro archivos, cada uno con una sola
+responsabilidad, para que sea facil de leer y de mantener.
+
+El orden de dependencias es: config <- modelos <- visualizacion <- main.
+Es decir, config no depende de nadie, y main depende de los otros tres.
+Asi evito importaciones circulares y se ve claro quien usa a quien.
+
+
+1. config.py — mi configuracion y mis datos
+--------------------------------------------
+Aqui guardo todo lo que es configuracion y datos, separado de la logica.
+La idea es que si cambio un dato (una estadistica, una ruta), solo toco
+este archivo y nunca el codigo.
+
+Que pongo dentro:
+  - Las rutas del proyecto, ancladas a la carpeta del propio script con
+    Path(__file__), para que funcionen ejecute desde donde ejecute.
+    CARPETA_CODIGO apunta a codigo/ y CARPETA_PKL al pkl/ de la raiz.
+  - RUTA_GRAFICO, donde guardo el png final (dentro de codigo/).
+  - ESTADISTICAS: las cinco stats que necesitan los modelos sin posicion
+    (pts, treb, ast, stl, blk).
+  - RANGOS_ORDEN: el orden fijo de los rangos de pick, para mostrarlos
+    siempre igual.
+  - JUGADORES: las estadisticas de Aday Mara, Baba Miller y Sergio de
+    Larrea (temporada 2025-26), cada uno con su color.
+
+
+2. modelos.py — mi logica de machine learning
+----------------------------------------------
+Aqui esta todo lo que tiene que ver con los modelos: cargarlos y predecir.
+
+Que hago en cada funcion:
+  - cargar_modelos(): cargo los cuatro .pkl. El modelo de ronda
+    (Random Forest sin posicion) con su codificador, y el modelo de rango
+    de pick (XGBoost sin posicion) con el suyo. Devuelvo los cuatro juntos.
+  - predecir(jugador, modelo, codificador): creo un dataframe con todas
+    las variables del modelo a 0, relleno solo las cinco estadisticas que
+    tengo del jugador, calculo la probabilidad de cada clase con
+    predict_proba y devuelvo un diccionario clase -> probabilidad. La misma
+    funcion me vale para ronda y para rango, porque la logica es identica.
+  - prob_draft(probs_ronda): sumo todas las probabilidades que no sean ND
+    para sacar la probabilidad total de ser drafteado, en porcentaje. La
+    saque a su propia funcion porque la usaba en tres sitios distintos, y
+    asi si cambio la formula la toco una sola vez.
+
+
+3. visualizacion.py — mi salida por pantalla y en grafico
+---------------------------------------------------------
+Aqui dejo todo lo que muestra resultados, ya sea como texto o como imagen.
+Importa prob_draft de modelos.py para no repetir la formula.
+
+Que hago en cada funcion:
+  - mostrar_resultados(jugador, probs_ronda, probs_rango): imprimo la ficha
+    de un jugador con su probabilidad de draft, su ronda y su rango mas
+    probables, y el detalle completo de probabilidades por ronda y por rango.
+  - mostrar_tabla_resumen(resultados): imprimo una tabla compacta con los
+    tres jugadores juntos, para verlo todo de un vistazo.
+  - mostrar_grafico(resultados): dibujo un panel por jugador con la
+    distribucion de probabilidades por rango de pick, sobre fondo oscuro y
+    resaltando el rango mas probable con el color de cada jugador. Guardo el
+    grafico en un png y ademas lo muestro por pantalla.
+
+
+4. main.py — mi director de orquesta
+------------------------------------
+Es el archivo que ejecuto. No tiene logica propia: solo importa de los
+otros tres y los encadena en el orden correcto.
+
+Que hace, paso a paso:
+  - Cargo los modelos y sus codificadores.
+  - Recorro cada jugador, calculo sus probabilidades de ronda y de rango,
+    muestro su ficha y guardo el resultado en una lista.
+  - Al final muestro la tabla resumen y el grafico con los tres juntos.
+
+Lo envuelvo todo en una funcion main() y lo llamo con el guard
+if __name__ == "__main__". Asi puedo importar mis modulos desde otro sitio
+(por ejemplo desde la app de Streamlit) sin que se ejecute todo de golpe.
+
+
+COMO LO EJECUTO
+---------------
+Los cuatro archivos tienen que estar juntos en la carpeta codigo/, y el
+pkl/ tiene que seguir en la raiz del proyecto, al lado de codigo/.
+Lo lanzo con:  python main.py   (desde la carpeta codigo/)
+o con:         python codigo/main.py   (desde la raiz del proyecto)
+Las dos formas funcionan, porque las rutas estan ancladas al script.
+
+Dependencias que necesito instaladas:
+scikit-learn, joblib, pandas, xgboost y matplotlib.

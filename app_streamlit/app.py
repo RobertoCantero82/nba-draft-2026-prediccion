@@ -66,7 +66,7 @@ html, body, [class*="css"] {
 }
 .app-header p {
     color: rgba(255,255,255,0.75);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     margin: 0.3rem 0 0 0;
     font-weight: 300;
 }
@@ -91,7 +91,7 @@ html, body, [class*="css"] {
 .stTabs [data-baseweb="tab"] {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.96rem;
     color: #6B7280;
     border-radius: 8px;
     padding: 0.5rem 1.2rem;
@@ -132,7 +132,7 @@ html, body, [class*="css"] {
     line-height: 1.1;
 }
 .player-meta {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     color: #9CA3AF;
     font-weight: 500;
     text-transform: uppercase;
@@ -171,7 +171,7 @@ html, body, [class*="css"] {
     line-height: 1;
 }
 .stat-label {
-    font-size: 0.65rem;
+    font-size: 0.74rem;
     color: #9CA3AF;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -187,7 +187,7 @@ html, body, [class*="css"] {
     margin-top: 1rem;
 }
 .pred-title {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: rgba(255,255,255,0.6);
@@ -201,12 +201,12 @@ html, body, [class*="css"] {
     margin-bottom: 0.4rem;
 }
 .pred-label {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     color: rgba(255,255,255,0.7);
 }
 .pred-value {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     letter-spacing: 1px;
 }
 .pred-value.orange { color: #F7520A; }
@@ -221,7 +221,7 @@ html, body, [class*="css"] {
     border-left: 3px solid #F7520A;
 }
 .comparable-label {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #F7520A;
@@ -235,7 +235,7 @@ html, body, [class*="css"] {
     letter-spacing: 1px;
 }
 .comparable-desc {
-    font-size: 0.78rem;
+    font-size: 0.88rem;
     color: #6B7280;
     margin-top: 0.2rem;
 }
@@ -247,7 +247,7 @@ html, body, [class*="css"] {
     gap: 0.4rem;
     background: #FF0000;
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     font-weight: 600;
     padding: 0.4rem 0.9rem;
     border-radius: 20px;
@@ -264,7 +264,7 @@ html, body, [class*="css"] {
     margin-bottom: 0.3rem;
 }
 .mock-subheader {
-    font-size: 0.85rem;
+    font-size: 0.94rem;
     color: #9CA3AF;
     margin-bottom: 1.5rem;
 }
@@ -282,7 +282,7 @@ html, body, [class*="css"] {
     line-height: 1;
 }
 .mock-result-label {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #9CA3AF;
@@ -300,7 +300,7 @@ html, body, [class*="css"] {
 .prob-bar-label {
     display: flex;
     justify-content: space-between;
-    font-size: 0.75rem;
+    font-size: 0.84rem;
     color: #6B7280;
     margin-bottom: 0.15rem;
     font-weight: 500;
@@ -325,7 +325,7 @@ html, body, [class*="css"] {
     margin-bottom: 1rem;
     border-left: 4px solid #1B4F8A;
 }
-.info-box p { margin: 0; font-size: 0.88rem; color: #374151; line-height: 1.6; }
+.info-box p { margin: 0; font-size: 0.96rem; color: #374151; line-height: 1.6; }
 .info-box strong { color: #1B4F8A; }
 
 /* ── DIVIDER ── */
@@ -341,7 +341,7 @@ html, body, [class*="css"] {
     color: white;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.93rem;
     border: none;
     border-radius: 10px;
     padding: 0.55rem 1.4rem;
@@ -371,8 +371,8 @@ html, body, [class*="css"] {
 # ─────────────────────────────────────────────
 JUGADORES = {
     "Aday Mara": {
-        "posicion": "C",
-        "liga": "ACB · Barça",
+        "posicion": "Pívot",
+        "liga": "NCAA - Michigan",
         "edad": 19,
         "altura": "2.13m",
         "mock_pick": "~#9",
@@ -380,43 +380,43 @@ JUGADORES = {
         "stats": {"PTS": 12.1, "REB": 6.8, "AST": 0.9, "ROB": 0.4, "TAP": 2.6, "FG%": 67.0},
         "comparable": {
             "nombre": "Kristaps Porzingis",
-            "desc": "Pívot europeo con impacto defensivo elite y potencial ofensivo sin explotar",
-            "youtube": "https://www.youtube.com/results?search_query=Kristaps+Porzingis+highlights"
+            "desc": "Pívot europeo con impacto defensivo de élite y techo ofensivo sin explotar",
+            "youtube": "https://www.youtube.com/watch?v=hiMFQ-gewJ8"
         },
         "arquetipo_label": "Pívot Defensivo Atlético",
-        "color": "#1B4F8A"
+        "color": "#F5EE20"
     },
     "Baba Miller": {
-        "posicion": "F",
-        "liga": "NCAA · Florida",
+        "posicion": "Ala-Pívot",
+        "liga": "NCAA - Florida State",
         "edad": 22,
         "altura": "2.06m",
         "mock_pick": "~#45",
         "mock_num": 45,
         "stats": {"PTS": 13.0, "REB": 10.3, "AST": 1.2, "ROB": 0.8, "TAP": 0.9, "FG%": 52.0},
         "comparable": {
-            "nombre": "Precious Achiuwa",
-            "desc": "Ala-pívot físico y reboteador con proyección como rol player en la NBA",
-            "youtube": "https://www.youtube.com/results?search_query=Precious+Achiuwa+highlights"
+            "nombre": "Pascal Siakam",
+            "desc": "Una versión joven con tremenda movilidad lateral y gran capacidad para correr la pista como una gacela",
+            "youtube": "https://www.youtube.com/watch?v=YqC7a5LVW3I"
         },
         "arquetipo_label": "Ala-Pívot Físico y Reboteador",
-        "color": "#F7520A"
+        "color": "#D61616"
     },
     "Sergio de Larrea": {
-        "posicion": "G",
-        "liga": "EuroLeague · Valencia",
+        "posicion": "Base",
+        "liga": "ACB - Valencia Basket",
         "edad": 21,
         "altura": "1.96m",
         "mock_pick": "~#40",
         "mock_num": 40,
         "stats": {"PTS": 9.5, "REB": 3.1, "AST": 4.2, "ROB": 1.1, "TAP": 0.2, "FG%": 44.0},
         "comparable": {
-            "nombre": "Facundo Campazzo",
-            "desc": "Base europeo creativo, alto coeficiente de baloncesto y visión de juego",
-            "youtube": "https://www.youtube.com/results?search_query=Facundo+Campazzo+highlights"
+            "nombre": "Josh Giddey",
+            "desc": "Gran tamaño y creatividad, pero con la duda de una primera marcha explosiva o un físico realmente preparado",
+            "youtube": "https://www.youtube.com/watch?v=uS6aP-i_2BQ"
         },
         "arquetipo_label": "Base Pasador y Defensor",
-        "color": "#1B4F8A"
+        "color": "#F88A2A"
     }
 }
 
@@ -557,9 +557,9 @@ st.markdown("""
 # TABS PRINCIPALES
 # ─────────────────────────────────────────────
 tab1, tab2, tab3 = st.tabs([
-    "🇪🇸  Españoles 2026",
-    "🎲  Mock Draft · Tu jugador",
-    "ℹ️  Cómo funciona"
+    "Españoles 2026",
+    "Draft personalizado",
+    "Funcionamiento del predictor"
 ])
 
 
@@ -641,7 +641,7 @@ with tab1:
                         </div>
                         <div class="pred-row">
                             <span class="pred-label">Arquetipo</span>
-                            <span class="pred-value white" style="font-size:0.85rem">{arquetipo}</span>
+                            <span class="pred-value white" style="font-size:0.94rem">{arquetipo}</span>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -675,7 +675,7 @@ with tab1:
                         </div>
                         <div class="pred-row">
                             <span class="pred-label">Arquetipo</span>
-                            <span class="pred-value white" style="font-size:0.85rem">{datos['arquetipo_label']}</span>
+                            <span class="pred-value white" style="font-size:0.94rem">{datos['arquetipo_label']}</span>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -752,7 +752,7 @@ with tab2:
 
             st.markdown(f"""
             <div class="mock-result">
-                <div style="font-size:0.8rem;color:#9CA3AF;font-weight:600;text-transform:uppercase;
+                <div style="font-size:0.88rem;color:#9CA3AF;font-weight:600;text-transform:uppercase;
                             letter-spacing:1px;margin-bottom:0.5rem">Predicción para</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;
                             color:#1B4F8A;letter-spacing:2px;margin-bottom:1rem">{nombre_display}</div>
@@ -772,7 +772,7 @@ with tab2:
                 </div>
                 <div style="background:#FFF4EE;border-radius:8px;padding:0.6rem 0.8rem;
                             display:inline-block;margin-bottom:1rem">
-                    <span style="font-size:0.7rem;color:#F7520A;font-weight:700;
+                    <span style="font-size:0.78rem;color:#F7520A;font-weight:700;
                                  text-transform:uppercase;letter-spacing:1px">Arquetipo · </span>
                     <span style="font-family:'Bebas Neue',sans-serif;color:#1B4F8A;
                                  font-size:1rem;letter-spacing:1px">{arquetipo}</span>
@@ -810,7 +810,7 @@ with tab2:
                             color:#1B4F8A;letter-spacing:2px;margin-bottom:0.5rem">
                     Introduce tus stats
                 </div>
-                <div style="font-size:0.85rem;color:#9CA3AF">
+                <div style="font-size:0.94rem;color:#9CA3AF">
                     Rellena el formulario y pulsa <strong>Predecir</strong><br>
                     para descubrir en qué ronda serías elegido.
                 </div>
@@ -882,19 +882,19 @@ with tab3:
                 <div>
                     <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;
                                 color:#F7520A">~1.200</div>
-                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);
+                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);
                                 text-transform:uppercase;letter-spacing:1px">Jugadores</div>
                 </div>
                 <div>
                     <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;
                                 color:#F7520A">12</div>
-                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);
+                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);
                                 text-transform:uppercase;letter-spacing:1px">Temporadas NCAA</div>
                 </div>
                 <div>
                     <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;
                                 color:#F7520A">3</div>
-                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6);
+                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);
                                 text-transform:uppercase;letter-spacing:1px">Modelos ML</div>
                 </div>
             </div>
