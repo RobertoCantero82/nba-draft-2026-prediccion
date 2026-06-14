@@ -30,9 +30,9 @@ El caso de uso: los tres jugadores españoles con opciones reales en el **NBA Dr
 
 | Jugador | Posición | Liga | Mock consensus | Predicción modelo |
 |---|---|---|---|---|
-| **Aday Mara** | Pívot | NCAA · Michigan | ~Pick 9 (lotería) | Probabilidad drafteado = 95.5% · rango 41-50* |
-| **Baba Miller** | Ala-Pívot | NCAA · Florida | ~Pick 45 | Probabilidad drafteado = 94.9% · rango 41-50 ✓ |
-| **Sergio de Larrea** | Base | EuroLeague · Valencia | ~Pick 40 (varianza 28-58) | Probabilidad drafteado = 88.3% · rango 41-50 |
+| **Aday Mara** | Pívot | Michigan | ~Pick 9 (lotería) | Probabilidad drafteado = 95.5% · rango 41-50* |
+| **Baba Miller** | Ala-Pívot | Florida State | ~Pick 45 | Probabilidad drafteado = 94.9% · rango 41-50 ✓ |
+| **Sergio de Larrea** | Base | Valencia Basket | ~Pick 40 (varianza 28-58) | Probabilidad drafteado = 88.3% · rango 41-50 |
 
 *La infravaloración de Aday Mara es el hallazgo más interesante del proyecto: su valor de lotería está en dimensiones físicas y de techo de desarrollo que las estadísticas de temporada no capturan.
 
