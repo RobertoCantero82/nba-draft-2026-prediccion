@@ -1,9 +1,7 @@
-# modelos.py
 # aqui cargo los modelos entrenados y hago las predicciones
 
 import joblib
 import pandas as pd
-
 from config import CARPETA_PKL, ESTADISTICAS
 
 

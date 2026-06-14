@@ -1,6 +1,3 @@
-# main.py
-# orquesta todo el flujo: cargo modelos, predigo y muestro resultados
-
 from config import JUGADORES
 from modelos import cargar_modelos, predecir
 from visualizacion import mostrar_resultados, mostrar_tabla_resumen, mostrar_grafico

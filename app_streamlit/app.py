@@ -1,16 +1,14 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
 import os
 import plotly.graph_objects as go
-from sklearn.preprocessing import StandardScaler
 
 # ─────────────────────────────────────────────
 # CONFIGURACIÓN DE PÁGINA
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="NBA Draft 2026 · Españoles",
+    page_title="NBA Draft 2026 - Predicción",
     page_icon="🏀",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -433,67 +431,50 @@ def cargar_modelos():
     # cargo los modelos guardados en pkl — uso rutas relativas desde app_streamlit/
     base = os.path.join(os.path.dirname(__file__), '..', 'pkl')
     try:
-        modelo_ronda  = joblib.load(os.path.join(base, 'modelos', 'xgb_draft_balanceado.pkl'))
-        modelo_rango  = joblib.load(os.path.join(base, 'modelos', 'xgb_rango_balanceado.pkl'))
-        modelo_arq    = joblib.load(os.path.join(base, 'modelos', 'kmeans_arquetipos.pkl'))
-        le_ronda      = joblib.load(os.path.join(base, 'preprocesado', 'le_target_draft.pkl'))
-        le_rango      = joblib.load(os.path.join(base, 'preprocesado', 'le_rango.pkl'))
-        return modelo_ronda, modelo_rango, modelo_arq, le_ronda, le_rango, True
+        modelo_ronda  = joblib.load(os.path.join(base, 'modelos',      'modelo_ronda_sin_posicion.pkl'))
+        modelo_rango  = joblib.load(os.path.join(base, 'modelos',      'modelo_rango_sin_posicion.pkl'))
+        le_ronda      = joblib.load(os.path.join(base, 'preprocesado', 'le_ronda_sin_posicion.pkl'))
+        le_rango      = joblib.load(os.path.join(base, 'preprocesado', 'le_rango_sin_posicion.pkl'))
+        return modelo_ronda, modelo_rango, le_ronda, le_rango, True
     except Exception as e:
-        return None, None, None, None, None, False
+        return None, None, None, None, False
 
-modelo_ronda, modelo_rango, modelo_arq, le_ronda, le_rango, modelos_ok = cargar_modelos()
+modelo_ronda, modelo_rango, le_ronda, le_rango, modelos_ok = cargar_modelos()
 
 
 # ─────────────────────────────────────────────
 # FUNCIONES AUXILIARES
 # ─────────────────────────────────────────────
-def build_input(pts, reb, ast, rob, tap, fg_pct, tiene_posicion=False):
-    """Construyo un dataframe con las estadísticas para pasarle al modelo."""
-    data = {
-        'pts': pts, 'treb': reb, 'ast': ast,
-        'stl': rob, 'blk': tap, 'fg_pct': fg_pct
-    }
+def build_input(pts, reb, ast, rob, tap):
+    """Construyo un dataframe con las cinco estadísticas que usan los modelos sin posición."""
+    data = {'pts': pts, 'treb': reb, 'ast': ast, 'stl': rob, 'blk': tap}
     return pd.DataFrame([data])
 
 
-def predecir_jugador(pts, reb, ast, rob, tap, fg_pct):
-    """Ejecuto los tres modelos y devuelvo ronda, rango y arquetipo."""
+def predecir_jugador(pts, reb, ast, rob, tap):
+    """Ejecuto los modelos de ronda y rango y devuelvo las probabilidades."""
     if not modelos_ok:
         return None
 
-    X = build_input(pts, reb, ast, rob, tap, fg_pct)
+    X = build_input(pts, reb, ast, rob, tap)
 
-    # --- ronda ---
+    # --- ronda (Random Forest sin posición — 34 variables) ---
     # reindexo para que las columnas coincidan con las del modelo entrenado
-    cols_ronda = modelo_ronda.get_booster().feature_names
+    cols_ronda = list(modelo_ronda.feature_names_in_)
     X_ronda = X.reindex(columns=cols_ronda, fill_value=0)
     probs_ronda = modelo_ronda.predict_proba(X_ronda)[0]
     clases_ronda = le_ronda.classes_  # ['ND', 'R1', 'R2']
 
-    # --- rango ---
-    cols_rango = modelo_rango.get_booster().feature_names
+    # --- rango (XGBoost sin posición — 34 variables) ---
+    cols_rango = list(modelo_rango.feature_names_in_)
     X_rango = X.reindex(columns=cols_rango, fill_value=0)
     probs_rango = modelo_rango.predict_proba(X_rango)[0]
     clases_rango = le_rango.classes_
 
-    # --- arquetipo: uso solo stats físicas básicas ---
-    try:
-        X_arq = np.array([[pts, reb, ast, rob, tap]])
-        arquetipo_id = modelo_arq.predict(X_arq)[0]
-        arquetipos_nombres = [
-            "Anotador Explosivo", "Ala-Pívot Físico", "Base Creativo",
-            "Pívot Defensivo", "3&D Specialist", "Comodín Versátil"
-        ]
-        arquetipo_nombre = arquetipos_nombres[arquetipo_id % len(arquetipos_nombres)]
-    except:
-        arquetipo_nombre = "Perfil sin clasificar"
-
     return {
-        "probs_ronda":  dict(zip(clases_ronda, probs_ronda)),
-        "probs_rango":  dict(zip(clases_rango, probs_rango)),
-        "arquetipo":    arquetipo_nombre,
-        "prob_draft":   sum(p for c, p in zip(clases_ronda, probs_ronda) if c != "ND") * 100
+        "probs_ronda": dict(zip(clases_ronda, probs_ronda)),
+        "probs_rango": dict(zip(clases_rango, probs_rango)),
+        "prob_draft":  sum(p for c, p in zip(clases_ronda, probs_ronda) if c != "ND") * 100
     }
 
 
@@ -529,7 +510,7 @@ def spider_chart(stats_dict, nombre, color):
 
 def prob_bar_html(label, valor, color="#1B4F8A"):
     """Genero una barra de probabilidad en HTML."""
-    pct = round(valor * 100, 1)
+    pct = round(float(valor) * 100, 1)
     return f"""
     <div class="prob-bar-wrap">
         <div class="prob-bar-label"><span>{label}</span><span>{pct}%</span></div>
@@ -542,15 +523,75 @@ def prob_bar_html(label, valor, color="#1B4F8A"):
 # ─────────────────────────────────────────────
 # HEADER
 # ─────────────────────────────────────────────
-st.markdown("""
-<div class="app-header">
-    <div>
-        <h1>🏀 NBA Draft 2026<br>Predicción · Españoles</h1>
-        <p>Machine Learning aplicado al draft — The Bridge Data Science Bootcamp</p>
-    </div>
-    <div class="header-badge">Draft · 26 Jun 2026</div>
-</div>
-""", unsafe_allow_html=True)
+_header_html = (
+    '<div style="background:linear-gradient(135deg,#1B4F8A 0%,#0d3060 55%,#c94a0a 100%);'
+    'border-radius:16px;padding:0;margin-bottom:1.5rem;height:110px;position:relative;'
+    'overflow:hidden;display:flex;align-items:stretch;">'
+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:9rem;color:rgba(247,82,10,0.18);'
+    'position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);line-height:1;'
+    'pointer-events:none;letter-spacing:-2px;">2026</div>'
+
+    '<div style="display:flex;flex-direction:column;justify-content:center;'
+    'padding:0 2rem;min-width:300px;z-index:2;">'
+    '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.1rem">'
+    '<span style="font-size:1.6rem">&#127919;</span>'
+    '<span style="font-family:Bebas Neue,sans-serif;font-size:2.4rem;color:white;'
+    'letter-spacing:4px;line-height:1;">DraftRadar</span>'
+    '</div>'
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;'
+    'color:rgba(255,255,255,0.65);letter-spacing:2.5px;margin-bottom:0.25rem;">'
+    'NBA DRAFT 2026 &middot; CANDIDATOS ESPA&Ntilde;OLES</div>'
+    '<div style="font-size:0.78rem;color:rgba(255,255,255,0.45);letter-spacing:0.3px;">'
+    'Machine Learning aplicado al draft &mdash; The Bridge Data Science Bootcamp</div>'
+    '</div>'
+
+    '<div style="flex:1;display:flex;align-items:center;justify-content:center;'
+    'gap:2rem;z-index:2;padding:0 1rem;">'
+
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem">'
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:white;letter-spacing:2px;">ADAY MARA</div>'
+    '<div style="width:46px;height:62px;background:rgba(255,255,255,0.08);border-radius:8px;'
+    'border:1.5px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;'
+    'align-items:center;justify-content:center;gap:2px;">'
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)">'
+    '<path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z"/>'
+    '<path d="M12 14.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>'
+    '</svg>'
+    '<span style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:#F7520A;line-height:1;">#9</span>'
+    '</div>'
+    '</div>'
+
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem">'
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:white;letter-spacing:2px;">BABA MILLER</div>'
+    '<div style="width:46px;height:62px;background:rgba(255,255,255,0.08);border-radius:8px;'
+    'border:1.5px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;'
+    'align-items:center;justify-content:center;gap:2px;">'
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)">'
+    '<path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z"/>'
+    '<path d="M12 14.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>'
+    '</svg>'
+    '<span style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:#F7520A;line-height:1;">#45</span>'
+    '</div>'
+    '</div>'
+
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem">'
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:white;letter-spacing:2px;">SERGIO DE LARREA</div>'
+    '<div style="width:46px;height:62px;background:rgba(255,255,255,0.08);border-radius:8px;'
+    'border:1.5px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;'
+    'align-items:center;justify-content:center;gap:2px;">'
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)">'
+    '<path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z"/>'
+    '<path d="M12 14.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>'
+    '</svg>'
+    '<span style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:#F7520A;line-height:1;">#40</span>'
+    '</div>'
+    '</div>'
+
+    '</div>'
+    '</div>'
+)
+st.markdown(_header_html, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────
@@ -569,8 +610,8 @@ tab1, tab2, tab3 = st.tabs([
 with tab1:
     st.markdown("""
     <div class="info-box">
-        <p>Analizo las estadísticas de temporada de los tres candidatos españoles al <strong>NBA Draft 2026</strong>
-        y aplico los modelos de ML entrenados para predecir su ronda de elección, rango de pick y arquetipo de jugador.
+        <p>Analizo las estadísticas de la temporada de los tres candidatos españoles al <strong>NBA Draft 2026</strong>
+        y aplico los modelos de ML entrenados para predecir su ronda de elección y rango de pick.
         Pulsa <strong>Predecir</strong> en cada jugador para ver los resultados.</p>
     </div>
     """, unsafe_allow_html=True)
@@ -585,7 +626,7 @@ with tab1:
             # ── CARD ──
             st.markdown(f"""
             <div class="player-card" data-pick="{datos['mock_num']}">
-                <div class="mock-pick">Mock consensus {datos['mock_pick']}</div>
+                <div class="mock-pick">Proyección expertos {datos['mock_pick']}</div>
                 <div class="player-name">{nombre}</div>
                 <div class="player-meta">{datos['posicion']} · {datos['liga']} · {datos['edad']} años · {datos['altura']}</div>
                 <div class="stats-grid">
@@ -605,14 +646,16 @@ with tab1:
 
             # ── BOTÓN PREDECIR ──
             key_btn = f"btn_{nombre.replace(' ','_')}"
-            if st.button(f"🔮 Predecir · {nombre.split()[0]}", key=key_btn):
-                st.session_state[f"pred_{nombre}"] = True
+            _, col_btn, _ = st.columns([1, 2, 1])
+            with col_btn:
+                if st.button(f"Predecir - {nombre.split()[0]}", key=key_btn):
+                    st.session_state[f"pred_{nombre}"] = True
 
             # ── RESULTADO ──
             if st.session_state.get(f"pred_{nombre}"):
                 resultado = predecir_jugador(
                     stats["PTS"], stats["REB"], stats["AST"],
-                    stats["ROB"], stats["TAP"], stats["FG%"]
+                    stats["ROB"], stats["TAP"]
                 )
 
                 if resultado:
@@ -621,7 +664,7 @@ with tab1:
                     ronda_pred  = max(pr, key=pr.get)
                     rango_pred  = max(pg, key=pg.get)
                     prob_draft  = resultado["prob_draft"]
-                    arquetipo   = resultado["arquetipo"]
+                    arquetipo   = datos["arquetipo_label"]
 
                     # caja de resultado
                     st.markdown(f"""
@@ -636,12 +679,8 @@ with tab1:
                             <span class="pred-value white">{rango_pred}</span>
                         </div>
                         <div class="pred-row">
-                            <span class="pred-label">P(ser drafteado)</span>
+                            <span class="pred-label">Prob. de ser drafteado</span>
                             <span class="pred-value orange">{prob_draft:.1f}%</span>
-                        </div>
-                        <div class="pred-row">
-                            <span class="pred-label">Arquetipo</span>
-                            <span class="pred-value white" style="font-size:0.94rem">{arquetipo}</span>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -670,7 +709,7 @@ with tab1:
                             <span class="pred-value white">41-50</span>
                         </div>
                         <div class="pred-row">
-                            <span class="pred-label">P(ser drafteado)</span>
+                            <span class="pred-label">Prob. de ser drafteado</span>
                             <span class="pred-value orange">64.6%</span>
                         </div>
                         <div class="pred-row">
@@ -703,15 +742,16 @@ with tab1:
 # ═════════════════════════════════════════════
 with tab2:
     st.markdown("""
-    <div class="mock-header">🎲 Mock Draft · Tu Jugador</div>
+    <div class="mock-header">🎲 Draft Virtual</div>
     <div class="mock-subheader">
         Introduce las estadísticas básicas de cualquier jugador y el modelo predice
-        en qué ronda y rango podría ser drafteado. ¿Cuánto vales tú en el draft?
+        en qué ronda y rango podría ser drafteado. ¿Podrías llegar tú a la NBA?
     </div>
     """, unsafe_allow_html=True)
 
     col_form, col_res = st.columns([1, 1], gap="large")
 
+    # ── COLUMNA IZQUIERDA: formulario + spider (siempre visible) ──
     with col_form:
         st.markdown("**Nombre del jugador**")
         nombre_mock = st.text_input("", placeholder="Ej: Roberto Cantero", label_visibility="collapsed", key="nombre_mock")
@@ -719,20 +759,29 @@ with tab2:
         st.markdown("**Estadísticas de temporada**")
         mc1, mc2 = st.columns(2)
         with mc1:
-            pts_m  = st.number_input("Puntos por partido",    min_value=0.0, max_value=45.0, value=15.0, step=0.1, key="pts_m")
-            reb_m  = st.number_input("Rebotes por partido",   min_value=0.0, max_value=20.0, value=6.0,  step=0.1, key="reb_m")
-            ast_m  = st.number_input("Asistencias por partido", min_value=0.0, max_value=15.0, value=3.0, step=0.1, key="ast_m")
+            pts_m  = st.number_input("Puntos por partido",      min_value=0.0, max_value=45.0,  value=15.0, step=0.1, key="pts_m")
+            reb_m  = st.number_input("Rebotes por partido",     min_value=0.0, max_value=20.0,  value=6.0,  step=0.1, key="reb_m")
+            ast_m  = st.number_input("Asistencias por partido", min_value=0.0, max_value=15.0,  value=3.0,  step=0.1, key="ast_m")
         with mc2:
-            rob_m  = st.number_input("Robos por partido",     min_value=0.0, max_value=5.0,  value=1.0,  step=0.1, key="rob_m")
-            tap_m  = st.number_input("Tapones por partido",   min_value=0.0, max_value=6.0,  value=0.5,  step=0.1, key="tap_m")
-            fg_m   = st.number_input("FG% (porcentaje tiro)", min_value=0.0, max_value=100.0, value=48.0, step=0.5, key="fg_m")
+            rob_m  = st.number_input("Robos por partido",       min_value=0.0, max_value=5.0,   value=1.0,  step=0.1, key="rob_m")
+            tap_m  = st.number_input("Tapones por partido",     min_value=0.0, max_value=6.0,   value=0.5,  step=0.1, key="tap_m")
+            fg_m   = st.number_input("FG% (porcentaje tiro)",   min_value=0.0, max_value=100.0, value=48.0, step=0.5, key="fg_m")
 
-        predecir_mock = st.button("🏀 Predecir mi draft pick", key="btn_mock")
+        # botón centrado
+        _, col_btn_mock, _ = st.columns([1, 2, 1])
+        with col_btn_mock:
+            predecir_mock = st.button("🏀 Predecir mi draft pick", key="btn_mock")
 
+        # spider: siempre visible, se actualiza en tiempo real con los inputs
+        nombre_display = nombre_mock.strip() if nombre_mock.strip() else "Tu jugador"
+        stats_mock = {"PTS": pts_m, "REB": reb_m, "AST": ast_m, "ROB": rob_m, "TAP": tap_m, "FG%": fg_m}
+        fig_mock = spider_chart(stats_mock, nombre_display, "#F7520A")
+        st.plotly_chart(fig_mock, use_container_width=True, config={"displayModeBar": False})
+
+    # ── COLUMNA DERECHA: resultados tras pulsar Predecir ──
     with col_res:
         if predecir_mock:
-            nombre_display = nombre_mock.strip() if nombre_mock.strip() else "Tu jugador"
-            resultado_mock = predecir_jugador(pts_m, reb_m, ast_m, rob_m, tap_m, fg_m)
+            resultado_mock = predecir_jugador(pts_m, reb_m, ast_m, rob_m, tap_m)
 
             if resultado_mock:
                 pr = resultado_mock["probs_ronda"]
@@ -740,46 +789,45 @@ with tab2:
                 ronda_pred = max(pr, key=pr.get)
                 rango_pred = max(pg, key=pg.get)
                 prob_draft = resultado_mock["prob_draft"]
-                arquetipo  = resultado_mock["arquetipo"]
             else:
-                # demo fallback con los valores introducidos
+                # demo fallback
                 pr = {"ND": 0.35, "R1": 0.28, "R2": 0.37}
                 pg = {"1-10": 0.05, "11-20": 0.08, "21-30": 0.10, "31-40": 0.12, "41-50": 0.28, "51-60": 0.25, "ND": 0.12}
                 ronda_pred = "R2"
                 rango_pred = "41-50"
                 prob_draft = 73.0
-                arquetipo  = "Ala-Pívot Físico"
 
+            # ── bloque P(draft) destacado ──
             st.markdown(f"""
-            <div class="mock-result">
-                <div style="font-size:0.88rem;color:#9CA3AF;font-weight:600;text-transform:uppercase;
-                            letter-spacing:1px;margin-bottom:0.5rem">Predicción para</div>
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;
-                            color:#1B4F8A;letter-spacing:2px;margin-bottom:1rem">{nombre_display}</div>
-                <div style="display:flex;gap:2rem;margin-bottom:1rem">
-                    <div>
-                        <div class="mock-result-label">Ronda</div>
-                        <div class="mock-result-ronda">{ronda_pred}</div>
-                    </div>
-                    <div>
-                        <div class="mock-result-label">Rango pick</div>
-                        <div class="mock-result-ronda">{rango_pred}</div>
-                    </div>
-                    <div>
-                        <div class="mock-result-label">P(draft)</div>
-                        <div class="mock-result-pick">{prob_draft:.0f}%</div>
-                    </div>
+            <div style="background:linear-gradient(135deg,#1B4F8A,#0d3060);border-radius:16px;
+                        padding:1.8rem 2rem;text-align:center;margin-bottom:1.2rem">
+                <div style="font-size:0.78rem;text-transform:uppercase;letter-spacing:2px;
+                            color:rgba(255,255,255,0.55);font-weight:600;margin-bottom:0.4rem">
+                    Probabilidad de ser drafteado
                 </div>
-                <div style="background:#FFF4EE;border-radius:8px;padding:0.6rem 0.8rem;
-                            display:inline-block;margin-bottom:1rem">
-                    <span style="font-size:0.78rem;color:#F7520A;font-weight:700;
-                                 text-transform:uppercase;letter-spacing:1px">Arquetipo · </span>
-                    <span style="font-family:'Bebas Neue',sans-serif;color:#1B4F8A;
-                                 font-size:1rem;letter-spacing:1px">{arquetipo}</span>
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:5rem;
+                            color:#F7520A;line-height:1;letter-spacing:2px">
+                    {prob_draft:.0f}%
+                </div>
+                <div style="display:flex;justify-content:center;gap:2.5rem;margin-top:1rem">
+                    <div>
+                        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;
+                                    color:rgba(255,255,255,0.5);font-weight:600">Ronda</div>
+                        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;
+                                    color:white;letter-spacing:1px">{ronda_pred}</div>
+                    </div>
+                    <div style="width:1px;background:rgba(255,255,255,0.15)"></div>
+                    <div>
+                        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;
+                                    color:rgba(255,255,255,0.5);font-weight:600">Rango pick</div>
+                        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.6rem;
+                                    color:white;letter-spacing:1px">{rango_pred}</div>
+                    </div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
+            # ── barras de probabilidad por ronda ──
             st.markdown("##### Probabilidades por ronda")
             bars_html = ""
             color_map = {"ND": "#9CA3AF", "R1": "#1B4F8A", "R2": "#F7520A"}
@@ -787,6 +835,7 @@ with tab2:
                 bars_html += prob_bar_html(clase, prob, color_map.get(clase, "#888"))
             st.markdown(bars_html, unsafe_allow_html=True)
 
+            # ── barras de probabilidad por rango ──
             st.markdown("##### Probabilidades por rango de pick")
             bars_rango = ""
             rangos_ordenados = ["1-10","11-20","21-30","31-40","41-50","51-60","ND"]
@@ -796,11 +845,6 @@ with tab2:
                 bars_rango += prob_bar_html(rango, prob_r, color_r)
             st.markdown(bars_rango, unsafe_allow_html=True)
 
-            # spider del jugador mock
-            stats_mock = {"PTS": pts_m, "REB": reb_m, "AST": ast_m, "ROB": rob_m, "TAP": tap_m, "FG%": fg_m}
-            fig_mock = spider_chart(stats_mock, nombre_display, "#F7520A")
-            st.plotly_chart(fig_mock, use_container_width=True, config={"displayModeBar": False})
-
         else:
             st.markdown("""
             <div style="background:white;border-radius:14px;padding:3rem 2rem;text-align:center;
@@ -808,11 +852,11 @@ with tab2:
                 <div style="font-size:3rem;margin-bottom:1rem">🏀</div>
                 <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;
                             color:#1B4F8A;letter-spacing:2px;margin-bottom:0.5rem">
-                    Introduce tus stats
+                    Rellena tus stats y predice
                 </div>
                 <div style="font-size:0.94rem;color:#9CA3AF">
-                    Rellena el formulario y pulsa <strong>Predecir</strong><br>
-                    para descubrir en qué ronda serías elegido.
+                    El spider se actualiza en tiempo real.<br>
+                    Pulsa <strong>Predecir</strong> para ver tu ronda y rango.
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -822,81 +866,67 @@ with tab2:
 # TAB 3 — CÓMO FUNCIONA
 # ═════════════════════════════════════════════
 with tab3:
-    col_i1, col_i2 = st.columns(2, gap="large")
+    c3a, c3b, c3c = st.columns(3, gap="large")
 
-    with col_i1:
+    with c3a:
         st.markdown("""
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;
-                    color:#1B4F8A;letter-spacing:2px;margin-bottom:1rem">
-            Los Modelos
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;
+                    color:#1B4F8A;letter-spacing:2px;margin-bottom:0.8rem">⚙️ Los modelos</div>
+        <div class="info-box" style="margin-bottom:0.6rem">
+            <p><strong>Ronda</strong> (Random Forest)<br>
+            R1 / R2 / ND. Entrenado con NCAA 2009–2021. F1 macro 0.60.</p>
+        </div>
+        <div class="info-box" style="margin-bottom:0.6rem">
+            <p><strong>Rango de pick</strong> (XGBoost)<br>
+            7 clases: 1-10 hasta 51-60 + ND. F1 macro 0.23 — techo estructural del problema.</p>
+        </div>
+        <div class="info-box">
+            <p><strong>Arquetipo</strong> (K-Means k=7)<br>
+            Entrenado con datos del NBA Combine: altura, peso, envergadura, salto y agilidad.</p>
         </div>
         """, unsafe_allow_html=True)
 
-        for titulo, texto in [
-            ("Modelo de Ronda", "Predice si un jugador será elegido en primera ronda (R1), segunda ronda (R2) o no será drafteado (ND). Entrenado con datos de la NCAA 2009–2021 usando XGBoost con pesos balanceados para compensar el desbalanceo de clases."),
-            ("Modelo de Rango", "Predice el rango de pick (1-10, 11-20... 51-60 o ND). Siete clases con un desbalanceo extremo — ND representa el 70% de los jugadores. El modelo aprende la diferencia entre rangos usando estadísticas de temporada."),
-            ("Modelo de Arquetipo", "Clustering K-Means entrenado con datos del NBA Combine. Agrupa a los jugadores en perfiles tipo según sus medidas físicas y atléticas, y asigna el arquetipo más cercano al nuevo jugador."),
-        ]:
-            st.markdown(f"""
-            <div class="info-box" style="margin-bottom:0.8rem">
-                <p><strong>{titulo}</strong><br>{texto}</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-    with col_i2:
+    with c3b:
         st.markdown("""
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;
-                    color:#1B4F8A;letter-spacing:2px;margin-bottom:1rem">
-            Limitaciones del Modelo
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="info-box" style="border-left-color:#F7520A;margin-bottom:0.8rem">
-            <p><strong>El dataset es de NCAA americana 2009–2021.</strong>
-            Jugadores como Aday Mara (pivote europeo) o Sergio de Larrea (base de EuroLeague)
-            no tienen precedente directo en el entrenamiento. El modelo predice a partir
-            de las estadísticas numéricas, sin ver el contexto de liga ni el potencial físico.</p>
-        </div>
-        <div class="info-box" style="border-left-color:#F7520A;margin-bottom:0.8rem">
-            <p><strong>Las probabilidades son más informativas que la clase predicha.</strong>
-            Una predicción de ND con probabilidad 35% no significa "no será drafteado"
-            — significa que el modelo tiene alta incertidumbre. La probabilidad combinada
-            R1+R2 es la señal clave.</p>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;
+                    color:#1B4F8A;letter-spacing:2px;margin-bottom:0.8rem">⚠️ Limitaciones</div>
+        <div class="info-box" style="border-left-color:#F7520A;margin-bottom:0.6rem">
+            <p><strong>Dataset NCAA americano.</strong> Los tres candidatos son europeos sin
+            precedente directo en el entrenamiento. El modelo solo ve estadísticas numéricas.</p>
         </div>
         <div class="info-box" style="border-left-color:#F7520A">
-            <p><strong>El draft no es solo estadística.</strong>
-            El consenso de scouts incorpora información que el modelo no tiene: trabajo de
-            pre-draft, entrevistas con franquicias, atletismo, techo de desarrollo y
-            necesidades específicas de cada equipo. Esta brecha entre ML y scouts
-            es, en sí misma, el hallazgo más interesante del proyecto.</p>
+            <p><strong>Probabilidad, no certeza.</strong> La distribución R1+R2+ND es
+            la señal clave, no la clase predicha. Un 35% de ND indica incertidumbre alta,
+            no descarte.</p>
         </div>
         """, unsafe_allow_html=True)
 
+    with c3c:
+        st.markdown("""
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;
+                    color:#1B4F8A;letter-spacing:2px;margin-bottom:0.8rem">📊 El dataset</div>
+        """, unsafe_allow_html=True)
         st.markdown("""
         <div style="background:linear-gradient(135deg,#1B4F8A,#0d3060);border-radius:14px;
-                    padding:1.5rem;margin-top:1rem;color:white;text-align:center">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;
-                        letter-spacing:2px;margin-bottom:0.5rem">Dataset de entrenamiento</div>
-            <div style="display:flex;justify-content:space-around;margin-top:0.8rem">
+                    padding:1.5rem;color:white;text-align:center;margin-bottom:0.6rem">
+            <div style="display:flex;justify-content:space-around">
                 <div>
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;
-                                color:#F7520A">~1.200</div>
-                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);
-                                text-transform:uppercase;letter-spacing:1px">Jugadores</div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#F7520A">~1.200</div>
+                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px">jugadores</div>
                 </div>
                 <div>
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;
-                                color:#F7520A">12</div>
-                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);
-                                text-transform:uppercase;letter-spacing:1px">Temporadas NCAA</div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#F7520A">12</div>
+                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px">temporadas</div>
                 </div>
                 <div>
-                    <div style="font-family:'Bebas Neue',sans-serif;font-size:2rem;
-                                color:#F7520A">3</div>
-                    <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);
-                                text-transform:uppercase;letter-spacing:1px">Modelos ML</div>
+                    <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#F7520A">34</div>
+                    <div style="font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px">variables</div>
                 </div>
             </div>
+        </div>
+        <div class="info-box" style="border-left-color:#F7520A">
+            <p><strong>El draft no es solo estadística.</strong> Scouts, entrevistas,
+            atletismo y necesidades de cada equipo son información que el modelo no tiene.
+            Esa brecha ML–scouts es el hallazgo más interesante del proyecto.</p>
         </div>
         """, unsafe_allow_html=True)

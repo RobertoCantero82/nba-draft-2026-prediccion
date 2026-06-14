@@ -1,4 +1,3 @@
-# visualizacion.py
 # aqui dejo todo lo que muestra resultados: por pantalla y en grafico
 
 import matplotlib.pyplot as plt

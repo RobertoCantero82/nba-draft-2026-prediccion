@@ -5,58 +5,73 @@
 #           para jugadores españoles en el Draft NBA 2026
 # Autor: Roberto Cantero
 # Fecha: Junio 2026
+# ------------------------------------------------------------
+# Nota: los modelos definitivos desplegados son las versiones
+# SIN POSICIÓN (34 variables). Eliminar la variable 'posicion'
+# evita introducir ruido para perfiles europeos sin precedente
+# en la NCAA. Los modelos base con posición (43 variables) se
+# conservan solo como referencia comparativa.
 # ============================================================
 
 # --- Modelo principal: predicción de ronda (ND / R1 / R2) ---
 modelo_ronda:
-  algoritmo: XGBClassifier
-  archivo: xgb_draft_randsearch.pkl
+  algoritmo: RandomForestClassifier
+  archivo: modelo_ronda_sin_posicion_mejor.pkl
+  variante: sin_posicion
+  n_variables: 34
   target: ronda
   clases: [ND, R1, R2]
   metrica_seleccion: macro_f1
-  macro_f1_test: 0.6110
-  auc_macro_test: 0.8558
+  macro_f1_test: 0.6016
 
   hiperparametros:
-    objective: multi:softmax
-    num_class: 3
     n_estimators: 200
-    max_depth: 3
-    learning_rate: 0.01
-    subsample: 1.0
-    colsample_bytree: 1.0
-    min_child_weight: 1
-    gamma: 0.5
-    eval_metric: mlogloss
+    max_depth: 6
+    class_weight: balanced
     random_state: 11
 
   preprocesado:
-    encoding_posicion: one_hot (drop_first=False)
+    encoding_posicion: ninguno (variable posicion eliminada)
     balanceo_clases: compute_sample_weight(balanced)
-    label_encoder: le_target_draft.pkl
+    escalado: no requiere (modelo de árboles)
+    label_encoder: le_ronda_sin_posicion.pkl
 
   split:
     test_size: 0.15
     stratify: true
     random_state: 11
 
-  busqueda_hiperparametros:
-    metodo: RandomizedSearchCV
-    n_iter: 50
-    cv: StratifiedKFold(n_splits=5)
-    scoring: f1_macro
+  comparativa_algoritmos:
+    # F1 macro de los cuatro algoritmos evaluados (sin posición)
+    random_forest: 0.6016   # <- ganador, modelo final
+    svm_rbf: 0.5671
+    xgboost: 0.5541
+    knn_k7: 0.4671
+    referencia_con_posicion: 0.61   # XGBoost base con posición (43 variables)
+
+  modelos_alternativos_guardados:
+    # todos los algoritmos quedan referenciados en pkl/modelos aunque solo se use el mejor
+    - modelo_ronda_sin_posicion_xgboost.pkl
+    - modelo_ronda_sin_posicion_random_forest.pkl
+    - modelo_ronda_sin_posicion_svm_rbf.pkl
+    - modelo_ronda_sin_posicion_knn.pkl
 
 # --- Modelo secundario: predicción de rango de pick (1-10 ... 51-60 / ND) ---
 modelo_rango:
   algoritmo: XGBClassifier
-  archivo: xgb_rango_randsearch.pkl
+  archivo: modelo_rango_sin_posicion_mejor.pkl
+  variante: sin_posicion
+  n_variables: 34
   target: rango_pick
   clases: [1-10, 11-20, 21-30, 31-40, 41-50, 51-60, ND]
   metrica_seleccion: macro_f1
+  macro_f1_test: 0.2254
   nota: >
     El rango exacto tiene un techo bajo (~0.24 macro F1) con estadísticas
-    NCAA únicamente. Se usa como orientación secundaria, no como predicción
-    principal. Ver notebook segundo_modelo_eleccion.ipynb para análisis completo.
+    NCAA únicamente. Con 7 clases y ~100 jugadores por rango, el cuello de
+    botella es el problema, no el algoritmo. Se usa como orientación
+    secundaria mediante predict_proba (la distribución de probabilidades es
+    más informativa que la clase predicha), no como predicción principal.
 
   hiperparametros:
     objective: multi:softmax
@@ -64,51 +79,122 @@ modelo_rango:
     eval_metric: mlogloss
     random_state: 11
 
-  busqueda_hiperparametros:
-    metodo: RandomizedSearchCV
-    n_iter: 50
-    cv: StratifiedKFold(n_splits=5)
-    scoring: f1_macro
+  preprocesado:
+    encoding_posicion: ninguno (variable posicion eliminada)
+    balanceo_clases: compute_sample_weight(balanced)
+    escalado: no requiere (modelo de árboles)
+    label_encoder: le_rango_sin_posicion.pkl
+
+  split:
+    test_size: 0.15
+    stratify: true
+    random_state: 11
+
+  comparativa_algoritmos:
+    # F1 macro de los cuatro algoritmos evaluados (sin posición)
+    xgboost: 0.2254         # <- ganador, modelo final
+    svm_rbf: 0.2145
+    random_forest: 0.2140
+    knn_k9: 0.1864
+    referencia_con_posicion: 0.24   # XGBoost base con posición (43 variables)
+
+  modelos_alternativos_guardados:
+    # todos los algoritmos quedan referenciados en pkl/modelos aunque solo se use el mejor
+    - modelo_rango_sin_posicion_xgboost.pkl
+    - modelo_rango_sin_posicion_random_forest.pkl
+    - modelo_rango_sin_posicion_svm_rbf.pkl
+    - modelo_rango_sin_posicion_knn.pkl
 
 # --- Modelo no supervisado: arquetipos de jugador ---
 modelo_arquetipos:
   algoritmo: KMeans
   archivo: kmeans_arquetipos.pkl
   input: combine_final.csv (medidas físicas del NBA Combine)
-  n_clusters: 5
+  n_clusters: 7
+  seleccion_k: método del codo (k evaluado de 2 a 12)
+  silhouette_score: 0.1608
+  variables_fisicas:
+    - HEIGHT_W_SHOES
+    - WEIGHT
+    - WINGSPAN
+    - STANDING_REACH
+    - MAX_VERTICAL_LEAP
+    - LANE_AGILITY_TIME
+    - THREE_QUARTER_SPRINT
+  preprocesado:
+    escalado: scaler_combine.pkl (StandardScaler)
+    reduccion_dim: pca_combine.pkl (solo para visualización 2D)
+  arquetipos:
+    0: Pívot clásico
+    1: Alero / Escolta versátil
+    2: Base / Escolta pequeño
+    3: Base / Escolta explosivo
+    4: Alero atlético explosivo
+    5: Pívot élite moderno
+    6: Alero / Escolta duro
   descripcion: >
-    Clustering de arquetipos físicos basado en medidas del combine
-    (altura, envergadura, peso, velocidad, salto). Usado para
-    identificar el arquetipo de cada prospecto español y sus
-    comparables históricos por distancia euclidiana.
+    Clustering de arquetipos físicos basado en medidas del combine.
+    Usado para identificar el arquetipo de cada prospecto español y sus
+    comparables históricos por distancia euclidiana. El Silhouette bajo es
+    esperable: los arquetipos físicos NBA se solapan por naturaleza, y el
+    objetivo es la utilidad práctica en la herramienta interactiva, no la
+    separación perfecta.
 
-# --- Dataset de entrenamiento ---
+# --- Datasets utilizados ---
 datos:
   fuente_principal: ncaa_final.csv
-  registros: 2121
-  variables: 35
   periodo: temporadas NCAA 2009-2021
+  fuentes:
+    ncaa:
+      archivo: ncaa_final.csv
+      descripcion: estadísticas de temporada NCAA + target de draft
+      raw: College Basketball Players 2009-2021 (61.061 x 66)
+    combine:
+      archivo: combine_final.csv
+      dimensiones: 1873 x 18
+      descripcion: medidas físicas del NBA Combine (clustering de arquetipos)
+    draft_historico:
+      archivo: nbaplayersdraft_limpio.csv
+      dimensiones: 1922 x 23
+      descripcion: historial de draft y carrera NBA real (referencias de arquetipos)
   targets:
     - ronda: [ND, R1, R2]
     - rango_pick: [1-10, 11-20, 21-30, 31-40, 41-50, 51-60, ND]
-  desbalanceo:
-    ND: 70.7%
-    R1: 15.2%
-    R2: 14.1%
+  desbalanceo_ronda:
+    ND: ~70%
+    R1: ~15%
+    R2: ~15%
+  metrica_principal: macro_f1
+  justificacion_metrica: >
+    El desbalanceo extremo (ND ~70%) hace que un modelo que prediga siempre
+    ND obtenga buena exactitud. Por eso la métrica principal es F1 macro.
 
 # --- Prospectos españoles evaluados ---
 prospectos:
   - nombre: Aday Mara
-    posicion: C
-    liga: ACB
+    posicion: Pívot
+    liga: NCAA
     mock_draft_referencia: ~pick 9 (top 10)
+    stats_2025_26: {pts: 12.1, treb: 6.8, ast: 0.9, stl: 0.4, blk: 2.6}
 
   - nombre: Baba Miller
-    posicion: PF/SF
+    posicion: Ala-Pívot
     liga: NCAA
     mock_draft_referencia: ~pick 45 (segunda ronda)
+    stats_2025_26: {pts: 13.0, treb: 10.3, ast: 1.2, stl: 0.8, blk: 0.9}
 
   - nombre: Sergio de Larrea
-    posicion: PG
-    liga: EuroLeague / Valencia Basket
+    posicion: Base
+    liga: Euroliga/ACB
     mock_draft_referencia: ~pick 40 (alta varianza, rango 28-58)
+    stats_2025_26: {pts: 9.5, treb: 3.1, ast: 4.2, stl: 1.1, blk: 0.2}
+
+# --- Hallazgo principal del proyecto ---
+hallazgo_principal: >
+  La brecha modelo-scout para Aday Mara (el modelo predice R2 / rango 41-50;
+  los scouts lo sitúan en R1 / top-10) no es un error del modelo, sino el
+  resultado más interesante: su valor está en variables que las estadísticas
+  de temporada no miden (atletismo, verticalidad defensiva, techo de
+  desarrollo). Random Forest sin posición (0.602) iguala prácticamente al
+  XGBoost con posición (0.61): las estadísticas numéricas solas contienen
+  casi toda la información predictiva.

@@ -1,4 +1,3 @@
-# config.py
 # aqui centralizo las rutas, las constantes y los datos de los jugadores
 # (todo lo que es "configuracion y datos", separado de la logica)
 
