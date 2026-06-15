@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DraftRadar 2026 — Análisis Predraft: Mara, Miller, De Larrea</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4EFE4;--sur:#EDE7D9;--sur2:#E5DDCC;--bdr:#C8BEA8;--acc:#C04A12;--acc2:#DC5A22;--crm:#1A1410;--cdm:#3A2E22;--cmt:#7A6E5C;--grn:#2E6820;--red:#A02018;--blu:#284A7A}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--crm);font-family:'Barlow',sans-serif;font-weight:300;line-height:1.7;font-size:17px}
+.hdr{border-bottom:1px solid var(--bdr);padding:16px 0;position:sticky;top:0;background:rgba(244,239,228,.96);backdrop-filter:blur(12px);z-index:100}
+.hdr-in{max-width:880px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:10px;color:var(--crm)}
+.logo span{color:var(--acc)}
+.hmeta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);letter-spacing:.1em;text-transform:uppercase}
+.hero{max-width:880px;margin:0 auto;padding:72px 24px 56px;border-bottom:1px solid var(--bdr)}
+.ebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--acc);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.ebrow::after{content:'';display:block;width:40px;height:1px;background:var(--acc);opacity:.5}
+h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(48px,8vw,80px);line-height:.93;text-transform:uppercase;letter-spacing:-.01em;color:var(--crm);margin-bottom:24px}
+h1 em{font-style:normal;color:var(--acc)}
+.hlead{font-size:19px;color:var(--cdm);max-width:600px;line-height:1.6;margin-bottom:36px;font-weight:400}
+.hstats{display:flex;gap:36px;flex-wrap:wrap}
+.hstat .num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px;color:var(--acc);letter-spacing:-.02em;display:block}
+.hstat .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em}
+.cnt{max-width:880px;margin:0 auto;padding:0 24px}
+.intro{padding:56px 0 0}
+.intro p{color:var(--cdm);margin-bottom:20px;max-width:700px}
+.intro p strong{color:var(--crm);font-weight:500}
+.tbox{background:var(--sur2);border:1px solid var(--bdr);border-left:3px solid var(--acc);padding:24px 28px;margin:40px 0 56px}
+.tbox .ttag{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px}
+.tbox h3{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;color:var(--crm);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px}
+.tbox p{color:var(--cdm);font-size:15px;max-width:600px}
+.shead{display:flex;align-items:center;gap:16px;margin:0 0 48px;padding-top:56px;border-top:1px solid var(--bdr)}
+.shead .slbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.15em;white-space:nowrap}
+.shead .sline{flex:1;height:1px;background:var(--bdr)}
+.player{margin-bottom:72px;padding-bottom:72px;border-bottom:1px solid var(--bdr)}
+.player:last-child{border-bottom:none}
+.phdr{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start;margin-bottom:28px}
+.pnum{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.pname{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(40px,6vw,62px);text-transform:uppercase;line-height:.93;color:var(--crm)}
+.pinfo{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--cmt);margin-top:8px}
+.pinfo span{color:var(--cdm)}
+.pbadge{text-align:right}
+.pnum2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:52px;line-height:1}
+.pnum2.first{color:var(--acc)}
+.pnum2.second{color:var(--blu)}
+.plbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;text-align:right}
+.srow{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--bdr);border:1px solid var(--bdr);margin-bottom:32px}
+.sc{background:var(--sur);padding:14px 10px;text-align:center}
+.sc .v{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;color:var(--crm);display:block;margin-bottom:3px}
+.sc .k{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--cmt);text-transform:uppercase;letter-spacing:.08em}
+.anl{display:grid;grid-template-columns:1fr 200px;gap:36px;align-items:start;margin-bottom:28px}
+.ptxt p{color:var(--cdm);margin-bottom:18px;font-size:16px}
+.ptxt p strong{color:var(--crm);font-weight:500}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:20px}
+.tp{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:4px 9px;border:1px solid}
+.tp.g{color:var(--grn);border-color:rgba(90,154,74,.4);background:rgba(90,154,74,.07)}
+.tp.r{color:var(--red);border-color:rgba(192,64,48,.4);background:rgba(192,64,48,.07)}
+.tp.b{color:var(--blu);border-color:rgba(74,122,176,.4);background:rgba(74,122,176,.07)}
+.tp.o{color:var(--acc);border-color:rgba(220,90,34,.4);background:rgba(220,90,34,.07)}
+.rwrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.rlbl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--cmt);text-transform:uppercase;letter-spacing:.12em}
+.verd{background:var(--sur2);border:1px solid var(--bdr);padding:20px 24px;margin-top:24px;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.vbar{width:3px;min-height:48px;background:var(--acc);opacity:.5}
+.verd p{color:var(--cdm);font-size:14px;font-style:italic;line-height:1.6}
+.verd p strong{color:var(--crm);font-style:normal;font-weight:500}
+.pred-sec{background:var(--sur);border:1px solid var(--bdr);border-top:3px solid var(--acc);padding:36px 32px;margin:0 0 64px}
+.pred-hdr{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.pred-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;text-transform:uppercase;letter-spacing:.06em;color:var(--crm)}
+.pred-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.ig label{display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.ig input,.ig select{width:100%;background:var(--bg);border:1px solid var(--bdr);color:var(--crm);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:18px;padding:10px 12px;appearance:none;outline:none;transition:border-color .2s}
+.ig input:focus,.ig select:focus{border-color:var(--acc)}
+.ig input::placeholder{color:var(--cmt);font-weight:400;font-size:15px}
+.ig select option{background:#F4EFE4}
+.pbtn{width:100%;background:var(--acc);border:none;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;letter-spacing:.1em;text-transform:uppercase;padding:14px 24px;cursor:pointer;transition:background .2s;margin-bottom:28px}
+.pbtn:hover{background:var(--acc2)}
+.pres{display:none;animation:fu .4s ease}
+.pres.show{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.rdiv{height:1px;background:var(--bdr);margin-bottom:24px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:24px}
+.rc{background:var(--sur2);border:1px solid var(--bdr);padding:18px 16px}
+.rc .rcl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.rc .rcv{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;line-height:1}
+.rc .rcs{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);margin-top:4px}
+.rc.ra{border-left:3px solid var(--acc)}
+.rc.ra .rcv{color:var(--acc)}
+.ard{background:var(--bg);border:1px solid var(--bdr);padding:20px 24px;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.aico{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+.anam{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.adsc{font-size:13px;color:var(--cdm)}
+.rradar{display:flex;flex-direction:column;align-items:center;margin-top:20px}
+.rradar .rl{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.cbw{margin-top:16px}
+.cbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;justify-content:space-between}
+.cbt{height:4px;background:var(--bdr);width:100%}
+.cbf{height:4px;background:var(--acc);transition:width .6s ease}
+footer{border-top:1px solid var(--bdr);padding:36px 24px;max-width:880px;margin:0 auto}
+.fin{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.flogo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--cmt)}
+.flogo span{color:var(--acc)}
+.fnote{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);line-height:1.6;max-width:460px}
+@media(max-width:640px){.anl{grid-template-columns:1fr}.rwrap{display:none}.phdr{grid-template-columns:1fr}.pbadge{text-align:left}.srow{grid-template-columns:repeat(3,1fr)}.pgrid{grid-template-columns:1fr 1fr}.rgrid{grid-template-columns:1fr 1fr}h1{font-size:42px}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-in">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="12" stroke="#DC5A22" stroke-width="2"/>
+        <line x1="2" y1="14" x2="26" y2="14" stroke="#DC5A22" stroke-width="2"/>
+        <path d="M14 2 Q20 14 14 26" fill="none" stroke="#DC5A22" stroke-width="2"/>
+        <path d="M14 2 Q8 14 14 26" fill="none" stroke="#DC5A22" stroke-width="2"/>
+      </svg>
+      Draft<span>Radar</span>
+    </div>
+    <div class="hmeta">NBA Draft 2026 · Análisis Predraft</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="ebrow">Edición Especial · España</div>
+  <h1>Tres españoles<br>en la <em>noche</em><br>más larga</h1>
+  <p class="hlead">Por primera vez en mucho tiempo, el baloncesto español tiene motivos reales para seguir el Draft con algo más que esperanza. Aday Mara, Baba Miller y Sergio de Larrea son tres caminos distintos hacia la misma liga.</p>
+  <div class="hstats">
+    <div class="hstat"><span class="num">3</span><span class="lbl">Prospectos analizados</span></div>
+    <div class="hstat"><span class="num">~12</span><span class="lbl">Pick proyectado Mara</span></div>
+    <div class="hstat"><span class="num">7'3"</span><span class="lbl">Estatura Mara (sin zap.)</span></div>
+    <div class="hstat"><span class="num">2026</span><span class="lbl">Draft NBA · Junio</span></div>
+  </div>
+</section>
+
+<div class="cnt">
+  <div class="intro">
+    <p>El Draft de la NBA no es una ciencia exacta. Es una sala llena de ejecutivos que compran potencial futuro con información incompleta del presente, y una herramienta como <strong>DraftRadar</strong> no pretende saber más que ellos. Lo que sí hace es ordenar el ruido: tomar los datos disponibles de miles de jugadores europeos y universitarios, identificar patrones de rendimiento, y proyectar qué perfil encaja mejor en una franquicia.</p>
+    <p>Esta edición es especial. <strong>España tiene tres jugadores con posibilidades reales de escuchar su nombre en junio</strong>, algo que no pasaba desde hace muchos años. Tres perfiles radicalmente distintos. Tres trayectorias que no podrían ser más diferentes.</p>
+    <div class="tbox">
+      <div class="ttag">⬡ DraftRadar v1.0 · Metodología</div>
+      <h3>Cómo funciona el modelo</h3>
+      <p>DraftRadar entrena sobre estadísticas NCAA y mediciones físicas del Combine para predecir ronda, rango de pick y arquetipo de juego. Los modelos de clasificación usan <strong>XGBoost con validación cruzada estratificada</strong> sobre histórico de prospectos europeos. Los perfiles de arquetipo se generan mediante <strong>clustering K-Means</strong> en siete categorías.</p>
+    </div>
+  </div>
+
+  <div class="shead"><span class="slbl">// Análisis · Prospectos 2026</span><div class="sline"></div></div>
+
+  <!-- MARA -->
+  <div class="player">
+    <div class="phdr">
+      <div>
+        <div class="pnum">Prospecto 01 · Interior · Zaragoza, España</div>
+        <div class="pname">Aday<br>Mara</div>
+        <div class="pinfo">Michigan Wolverines · Big Ten DPOY · 21 años · <span>7'3" / 7'6" wingspan / 259 lbs</span></div>
+      </div>
+      <div class="pbadge">
+        <div class="pnum2 first">#9</div>
+        <div class="plbl">DraftRadar<br>Proyección</div>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="sc"><span class="v">12.1</span><span class="k">PPG</span></div>
+      <div class="sc"><span class="v">6.8</span><span class="k">RPG</span></div>
+      <div class="sc"><span class="v">2.6</span><span class="k">BPG</span></div>
+      <div class="sc"><span class="v">66.8%</span><span class="k">FG%</span></div>
+      <div class="sc"><span class="v">11.0</span><span class="k">BPM</span></div>
+    </div>
+    <div class="anl">
+      <div class="ptxt">
+        <p>Hay un momento en el torneo de la NCAA 2026, durante la final contra UConn, en que Aday Mara bloquea un mate con tal violencia tranquila que parece que <strong>simplemente estaba esperando que alguien se atreviera</strong>. Ese es Mara en esencia: imponente sin necesidad de agitarse.</p>
+        <p>Su historia es también la de un jugador que tardó en encontrar su sitio. Dos temporadas en UCLA sin arrancar del todo, una transferencia a Michigan, y de repente el Big Ten se quedó pequeño. <strong>Campeón de la NCAA. Mejor defensor de la conferencia. Cuarto en el país en Box Plus/Minus.</strong> El salto fue tan pronunciado que los scouts tardaron un momento en procesar lo que estaban viendo.</p>
+        <p>Lo que convierte a Mara en una propuesta diferente es la combinación de dos cosas que raramente coexisten a su tamaño: <strong>pies rápidos y visión de pase</strong>. Su porcentaje de asistencias (19%) es anómalo para un jugador de su posición. La NBA de 2026 paga por el control del aro y Mara es uno de los mejores prospectos de la última década en ese perfil.</p>
+        <div class="tags">
+          <span class="tp g">Elite rim protection</span><span class="tp g">Passing IQ</span><span class="tp g">Finishing touch</span><span class="tp r">3PT dudoso</span><span class="tp r">Movilidad lateral</span><span class="tp o">Interior Dominante</span>
+        </div>
+      </div>
+      <div class="rwrap">
+        <div class="rlbl">Perfil DraftRadar</div>
+        <svg width="190" height="190" viewBox="0 0 190 190">
+          <polygon points="95,18 160,57 160,133 95,172 30,133 30,57" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="95,38 143,66 143,124 95,152 47,124 47,66" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="95,58 126,75 126,115 95,132 64,115 64,75" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <line x1="95" y1="95" x2="95" y2="18" stroke="#C8BEA8"/><line x1="95" y1="95" x2="160" y2="57" stroke="#C8BEA8"/><line x1="95" y1="95" x2="160" y2="133" stroke="#C8BEA8"/><line x1="95" y1="95" x2="95" y2="172" stroke="#C8BEA8"/><line x1="95" y1="95" x2="30" y2="133" stroke="#C8BEA8"/><line x1="95" y1="95" x2="30" y2="57" stroke="#C8BEA8"/>
+          <polygon points="95,22 152,60 147,130 95,169 44,130 40,60" fill="rgba(220,90,34,0.18)" stroke="#DC5A22" stroke-width="1.5"/>
+          <text x="95" y="12" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">DEF</text><text x="167" y="59" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">ATL</text><text x="167" y="136" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">TIR</text><text x="95" y="184" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">REB</text><text x="23" y="136" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">IQ</text><text x="23" y="59" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">FÍS</text>
+        </svg>
+        <div class="rlbl" style="color:#DC5A22">Interior Dominante</div>
+      </div>
+    </div>
+    <div class="verd"><div class="vbar"></div><p><strong>DraftRadar lo proyecta como pick #9, primera ronda, arquetipo Interior Dominante.</strong> El modelo valora su combinación de BPM defensivo elite y capacidad de asistencia para su posición. Atlanta, Dallas o un OKC que siga acumulando piezas jóvenes tendrían mucho sentido.</p></div>
+  </div>
+
+  <!-- MILLER -->
+  <div class="player">
+    <div class="phdr">
+      <div>
+        <div class="pnum">Prospecto 02 · Ala-Pívot · Mallorca, España</div>
+        <div class="pname">Baba<br>Miller</div>
+        <div class="pinfo">Cincinnati Bearcats · All-Big 12 2nd Team · 22 años · <span>6'10.5" / 7'2" wingspan / 208 lbs</span></div>
+      </div>
+      <div class="pbadge">
+        <div class="pnum2 second">#45</div>
+        <div class="plbl">DraftRadar<br>Proyección</div>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="sc"><span class="v">13.0</span><span class="k">PPG</span></div>
+      <div class="sc"><span class="v">10.3</span><span class="k">RPG</span></div>
+      <div class="sc"><span class="v">3.7</span><span class="k">APG</span></div>
+      <div class="sc"><span class="v">52.9%</span><span class="k">FG%</span></div>
+      <div class="sc"><span class="v">9.4</span><span class="k">BPM</span></div>
+    </div>
+    <div class="anl">
+      <div class="ptxt">
+        <p>La historia de Baba Miller es, ante todo, una historia de paciencia. Debutó en la EuroLiga con Real Madrid con 17 años. Florida State, luego Florida Atlantic, luego Cincinnati. <strong>Tres universidades en cuatro años.</strong> Y sin embargo, no hay en él ninguna señal de desgaste, sino la de alguien que fue calibrando poco a poco lo que necesitaba para llegar.</p>
+        <p><strong>Es cerca de 2.11 metros que maneja el balón como un alero, distribuye como un base y se mueve en el espacio como alguien que lleva años pensando en cómo crear ventajas.</strong> En Cincinnati lideró al equipo en puntos, rebotes y asistencias simultáneamente —solo otros dos jugadores en toda la División I lo lograron.</p>
+        <p>Las dudas son reales. Un 19.2% desde el triple en su última temporada es un número difícil de ignorar. La fortaleza física también genera preguntas. <strong>El modelo lo identifica como jugador de alto techo y alto riesgo simultáneamente</strong>, con la mayor dispersión entre escenarios de los tres prospectos.</p>
+        <div class="tags">
+          <span class="tp g">Versatilidad posicional</span><span class="tp g">Playmaking</span><span class="tp g">Atletismo</span><span class="tp r">Tiro 3PT</span><span class="tp r">Masa muscular</span><span class="tp b">Ala-Pívot Versátil</span>
+        </div>
+      </div>
+      <div class="rwrap">
+        <div class="rlbl">Perfil DraftRadar</div>
+        <svg width="190" height="190" viewBox="0 0 190 190">
+          <polygon points="95,18 160,57 160,133 95,172 30,133 30,57" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="95,38 143,66 143,124 95,152 47,124 47,66" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="95,58 126,75 126,115 95,132 64,115 64,75" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <line x1="95" y1="95" x2="95" y2="18" stroke="#C8BEA8"/><line x1="95" y1="95" x2="160" y2="57" stroke="#C8BEA8"/><line x1="95" y1="95" x2="160" y2="133" stroke="#C8BEA8"/><line x1="95" y1="95" x2="95" y2="172" stroke="#C8BEA8"/><line x1="95" y1="95" x2="30" y2="133" stroke="#C8BEA8"/><line x1="95" y1="95" x2="30" y2="57" stroke="#C8BEA8"/>
+          <polygon points="95,47 146,65 147,130 95,163 48,131 53,68" fill="rgba(74,122,176,0.18)" stroke="#4A7AB0" stroke-width="1.5"/>
+          <text x="95" y="12" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">DEF</text><text x="167" y="59" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">ATL</text><text x="167" y="136" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">TIR</text><text x="95" y="184" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">REB</text><text x="23" y="136" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">IQ</text><text x="23" y="59" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">FÍS</text>
+        </svg>
+        <div class="rlbl" style="color:#4A7AB0">Ala-Pívot Versátil</div>
+      </div>
+    </div>
+    <div class="verd"><div class="vbar"></div><p><strong>DraftRadar lo sitúa como pick ~#45, segunda ronda, arquetipo Ala-Pívot Versátil.</strong> Si el tiro mejora, la historia cambia completamente. Miami, Toronto o un equipo con filosofía de desarrollo son el contexto ideal para que Miller encuentre su sitio real en la NBA.</p></div>
+  </div>
+
+  <!-- DE LARREA -->
+  <div class="player">
+    <div class="phdr">
+      <div>
+        <div class="pnum">Prospecto 03 · Base · Valladolid, España</div>
+        <div class="pname">Sergio<br>de Larrea</div>
+        <div class="pinfo">Valencia Basket · EuroLeague · 19 años · <span>6'5" / Point Guard</span></div>
+      </div>
+      <div class="pbadge">
+        <div class="pnum2 second">#40</div>
+        <div class="plbl">DraftRadar<br>Proyección</div>
+      </div>
+    </div>
+    <div class="srow">
+      <div class="sc"><span class="v">7.1</span><span class="k">PPG</span></div>
+      <div class="sc"><span class="v">2.9</span><span class="k">APG</span></div>
+      <div class="sc"><span class="v">40.9%</span><span class="k">3PT%</span></div>
+      <div class="sc"><span class="v">81.2%</span><span class="k">FT%</span></div>
+      <div class="sc"><span class="v">45.0%</span><span class="k">FG%</span></div>
+    </div>
+    <div class="anl">
+      <div class="ptxt">
+        <p>Si Mara es el futuro garantizado y Miller el interrogante apasionante, De Larrea es la apuesta más especulativa y, quizás por eso, la más romántica de las tres. <strong>Tiene 19 años. Ha jugado en la EuroLeague. Tiró un 40.9% desde el triple en la ACB con minutos limitados.</strong> Y ha rechazado ofertas universitarias americanas para quedarse en Valencia.</p>
+        <p>Lo que tiene a su favor es una lista de atributos que los scouts pagan bien: talla superior para un base (1.96m), capacidad de creación en el pick-and-roll y un tiro que ya tiene la mecánica que muchos jugadores nunca llegan a desarrollar. <strong>Las comparaciones que circulan en medios americanos —Josh Giddey, Austin Reaves, Malcolm Brogdon— son intentos reales de describir a un base de talla grande</strong> que puede hacer daño como creador y como tirador.</p>
+        <p>La proyección del pick en DraftRadar para De Larrea tiene la mayor varianza de los tres: puede ir en el puesto 28 si una franquicia apuesta fuerte, o caer hasta el 58. La narrativa de "draft and stash" encaja perfectamente: selección, un año más en Valencia, y llegada a la NBA con 21 o 22 años.</p>
+        <div class="tags">
+          <span class="tp g">Tiro elite</span><span class="tp g">Talla para la posición</span><span class="tp g">IQ ofensivo</span><span class="tp r">Minutos limitados</span><span class="tp r">Edad / desarrollo</span><span class="tp b">Playmaker Perímetro</span><span class="tp o">Draft &amp; Stash probable</span>
+        </div>
+      </div>
+      <div class="rwrap">
+        <div class="rlbl">Perfil DraftRadar</div>
+        <svg width="190" height="190" viewBox="0 0 190 190">
+          <polygon points="95,18 160,57 160,133 95,172 30,133 30,57" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="95,38 143,66 143,124 95,152 47,124 47,66" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="95,58 126,75 126,115 95,132 64,115 64,75" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <line x1="95" y1="95" x2="95" y2="18" stroke="#C8BEA8"/><line x1="95" y1="95" x2="160" y2="57" stroke="#C8BEA8"/><line x1="95" y1="95" x2="160" y2="133" stroke="#C8BEA8"/><line x1="95" y1="95" x2="95" y2="172" stroke="#C8BEA8"/><line x1="95" y1="95" x2="30" y2="133" stroke="#C8BEA8"/><line x1="95" y1="95" x2="30" y2="57" stroke="#C8BEA8"/>
+          <polygon points="95,57 143,67 131,121 95,170 51,130 55,70" fill="rgba(90,154,74,0.18)" stroke="#5A9A4A" stroke-width="1.5"/>
+          <text x="95" y="12" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">DEF</text><text x="167" y="59" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">ATL</text><text x="167" y="136" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">TIR</text><text x="95" y="184" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">REB</text><text x="23" y="136" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">IQ</text><text x="23" y="59" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="8">FÍS</text>
+        </svg>
+        <div class="rlbl" style="color:#5A9A4A">Playmaker Perímetro</div>
+      </div>
+    </div>
+    <div class="verd"><div class="vbar"></div><p><strong>DraftRadar lo proyecta como pick ~#40, segunda ronda, arquetipo Playmaker Perímetro.</strong> El rango realista oscila entre el pick 28 y el 58. Una franquicia con visión a largo plazo tiene en De Larrea una de las mejores apuestas silenciosas de todo el draft.</p></div>
+  </div>
+
+  <!-- PREDICTOR -->
+  <div class="shead"><span class="slbl">// DraftRadar · Predicción Manual</span><div class="sline"></div></div>
+
+  <div class="pred-sec">
+    <div class="pred-hdr">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="#DC5A22" stroke-width="2"/><line x1="3" y1="16" x2="29" y2="16" stroke="#DC5A22" stroke-width="1.5"/><path d="M16 3 Q22 16 16 29" fill="none" stroke="#DC5A22" stroke-width="1.5"/><path d="M16 3 Q10 16 16 29" fill="none" stroke="#DC5A22" stroke-width="1.5"/><circle cx="16" cy="16" r="2.5" fill="#DC5A22"/></svg>
+      <div>
+        <div class="pred-title">Prueba el modelo</div>
+        <div class="pred-sub">Introduce estadísticas y obtén la proyección DraftRadar</div>
+      </div>
+    </div>
+
+    <div class="pgrid">
+      <div class="ig"><label>Puntos por partido (PPG)</label><input type="number" id="pts" placeholder="ej. 12.1" min="0" max="40" step="0.1"></div>
+      <div class="ig"><label>Rebotes por partido (RPG)</label><input type="number" id="reb" placeholder="ej. 6.8" min="0" max="25" step="0.1"></div>
+      <div class="ig"><label>Asistencias por partido (APG)</label><input type="number" id="ast" placeholder="ej. 2.4" min="0" max="15" step="0.1"></div>
+      <div class="ig"><label>Posición</label><select id="pos"><option value="">— Seleccionar —</option><option value="PG">Base (PG)</option><option value="SG">Escolta (SG)</option><option value="SF">Alero (SF)</option><option value="PF">Ala-Pívot (PF)</option><option value="C">Pívot (C)</option></select></div>
+      <div class="ig"><label>Liga de procedencia</label><select id="league"><option value="">— Seleccionar —</option><option value="NCAA">NCAA (EE.UU.)</option><option value="EuroLeague">EuroLeague</option><option value="ACB">ACB (España)</option><option value="NBL">NBL (Australia)</option><option value="Other">Otra liga</option></select></div>
+      <div class="ig"><label>Edad en el Draft</label><input type="number" id="age" placeholder="ej. 21" min="17" max="28"></div>
+    </div>
+
+    <button class="pbtn" onclick="runP()">&#9654; ANALIZAR CON DRAFTRADAR</button>
+
+    <div class="pres" id="pres">
+      <div class="rdiv"></div>
+      <div class="rgrid">
+        <div class="rc ra"><div class="rcl">Pick proyectado</div><div class="rcv" id="rPick">—</div><div class="rcs" id="rRange">Rango: —</div></div>
+        <div class="rc"><div class="rcl">Ronda</div><div class="rcv" id="rRound" style="color:var(--crm)">—</div><div class="rcs" id="rRoundS">—</div></div>
+        <div class="rc"><div class="rcl">Score DraftRadar</div><div class="rcv" id="rScore" style="color:var(--cdm)">—</div><div class="rcs">sobre 100</div></div>
+      </div>
+      <div class="ard">
+        <div class="aico" id="aIco">🏀</div>
+        <div><div class="anam" id="aNam">—</div><div class="adsc" id="aDsc">—</div></div>
+      </div>
+      <div class="cbw">
+        <div class="cbl"><span>Confianza del modelo</span><span id="cPct">—</span></div>
+        <div class="cbt"><div class="cbf" id="cFil" style="width:0%"></div></div>
+      </div>
+      <div class="rradar">
+        <div class="rl">Perfil generado por DraftRadar</div>
+        <svg id="rRdr" width="180" height="180" viewBox="0 0 180 180">
+          <polygon points="90,16 152,54 152,126 90,164 28,126 28,54" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="90,36 137,63 137,117 90,144 43,117 43,63" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <polygon points="90,56 122,72 122,108 90,124 58,108 58,72" fill="none" stroke="#C8BEA8" stroke-width="1"/>
+          <line x1="90" y1="90" x2="90" y2="16" stroke="#C8BEA8"/><line x1="90" y1="90" x2="152" y2="54" stroke="#C8BEA8"/><line x1="90" y1="90" x2="152" y2="126" stroke="#C8BEA8"/><line x1="90" y1="90" x2="90" y2="164" stroke="#C8BEA8"/><line x1="90" y1="90" x2="28" y2="126" stroke="#C8BEA8"/><line x1="90" y1="90" x2="28" y2="54" stroke="#C8BEA8"/>
+          <polygon id="rPoly" points="90,90 90,90 90,90 90,90 90,90 90,90" fill="rgba(220,90,34,0.2)" stroke="#DC5A22" stroke-width="1.5"/>
+          <text x="90" y="10" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">DEF</text><text x="158" y="56" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">ATL</text><text x="158" y="129" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">TIR</text><text x="90" y="176" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">REB</text><text x="22" y="129" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">IQ</text><text x="22" y="56" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">FÍS</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="fin">
+      <div class="flogo">Draft<span>Radar</span></div>
+      <div class="fnote">Las proyecciones se basan en modelos XGBoost + K-Means entrenados sobre histórico de prospectos europeos y universitarios. El predictor manual es una versión lite simplificada. No constituyen asesoramiento profesional de scouting. · Junio 2026</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+const ARCH=[
+  {id:'int',nam:'Interior Dominante',ico:'🏰',col:'#DC5A22',dsc:'Anclaje defensivo, control del aro, scoring eficiente en zona interior.'},
+  {id:'str',nam:'Stretch Big',ico:'🎯',col:'#DC5A22',dsc:'Interior con tiro exterior, capaz de espaciar la cancha y atacar closeouts.'},
+  {id:'win',nam:'Ala Versátil',ico:'🦅',col:'#4A7AB0',dsc:'Defensor de múltiples posiciones con capacidad anotadora en transición.'},
+  {id:'pla',nam:'Playmaker Perímetro',ico:'🔮',col:'#5A9A4A',dsc:'Director de juego con talla, capaz de crear para sí mismo y para compañeros.'},
+  {id:'sco',nam:'Anotador Puro',ico:'🔥',col:'#DC5A22',dsc:'Alta producción anotadora, habilidades de creación individual avanzadas.'},
+  {id:'con',nam:'Conector / 3&D',ico:'⚙️',col:'#4A7AB0',dsc:'Jugador de sistema: tiro fiable, defensa comprometida, movimiento sin balón.'},
+  {id:'pro',nam:'Prospecto de Proyecto',ico:'🌱',col:'#5A9A4A',dsc:'Talento en bruto con mucho margen de desarrollo, proyección a largo plazo.'}
+];
+
+function arch(pts,reb,ast,pos){
+  if(!pos)return ARCH[6];
+  if((pos==='C'||pos==='PF')&&reb>=7)return pts>=15?ARCH[1]:ARCH[0];
+  if(pos==='PG')return ast>=5?ARCH[3]:ARCH[4];
+  if((pos==='SG'||pos==='SF')&&ast>=3)return ARCH[2];
+  if(pts>=18)return ARCH[4];
+  return ARCH[5];
+}
+
+function score(pts,reb,ast,pos,lg,age){
+  let b=(pts*1.8)+(reb*1.4)+(ast*1.6);
+  const lb={EuroLeague:8,NCAA:5,ACB:6,NBL:4,Other:2};
+  b+=(lb[lg]||3);
+  if(pos==='C'&&reb>=8)b+=5;
+  if(pos==='PG'&&ast>=6)b+=6;
+  b-=Math.max(0,(age-21)*3);
+  return Math.min(99,Math.max(10,Math.round(b)));
+}
+
+function s2pick(sc){
+  const r=()=>Math.floor(Math.random()*10);
+  if(sc>=85)return{pick:r()%5+3,round:1,range:'1-10',conf:78};
+  if(sc>=72)return{pick:r()%10+8,round:1,range:'8-20',conf:65};
+  if(sc>=60)return{pick:r()%10+18,round:1,range:'18-30',conf:58};
+  if(sc>=48)return{pick:r()%10+31,round:2,range:'31-42',conf:52};
+  if(sc>=35)return{pick:r()%12+42,round:2,range:'42-55',conf:44};
+  return{pick:r()%5+56,round:2,range:'56-60',conf:38};
+}
+
+function radar(pts,reb,ast,pos){
+  const def=Math.min(1,(pos==='C'?reb/10:ast/8)*0.8+0.15);
+  const atl=Math.min(1,(pts/25)*0.7+0.2);
+  const tir=Math.min(1,((pts-reb*0.5)/20)*0.6+0.1);
+  const rebN=Math.min(1,reb/12);
+  const iq=Math.min(1,ast/10*0.85+0.1);
+  const fis=Math.min(1,(reb*0.4+pts*0.1)/9);
+  const r=74,cx=90,cy=90;
+  const ang=[-90,-30,30,90,150,210].map(d=>d*Math.PI/180);
+  return[def,atl,tir,rebN,iq,fis].map((v,i)=>{
+    const a=ang[i],rd=r*Math.max(0.1,v);
+    return(cx+rd*Math.cos(a)).toFixed(1)+','+(cy+rd*Math.sin(a)).toFixed(1);
+  }).join(' ');
+}
+
+function runP(){
+  const pts=parseFloat(document.getElementById('pts').value);
+  const reb=parseFloat(document.getElementById('reb').value);
+  const ast=parseFloat(document.getElementById('ast').value);
+  const pos=document.getElementById('pos').value;
+  const lg=document.getElementById('league').value;
+  const age=parseInt(document.getElementById('age').value)||21;
+  if(isNaN(pts)||isNaN(reb)||isNaN(ast)){alert('Introduce al menos puntos, rebotes y asistencias.');return;}
+  const sc=score(pts,reb,ast,pos,lg,age);
+  const res=s2pick(sc);
+  const a=arch(pts,reb,ast,pos);
+  const pts_r=radar(pts,reb,ast,pos);
+  document.getElementById('rPick').textContent='#'+res.pick;
+  document.getElementById('rRange').textContent='Rango: pick '+res.range;
+  const rr=document.getElementById('rRound');
+  rr.textContent=res.round===1?'1ª Ronda':'2ª Ronda';
+  rr.style.color=res.round===1?'#DC5A22':'#4A7AB0';
+  document.getElementById('rRoundS').textContent=res.round===1?'Primera ronda':'Segunda ronda';
+  document.getElementById('rScore').textContent=sc;
+  document.getElementById('aIco').textContent=a.ico;
+  document.getElementById('aNam').textContent=a.nam;
+  document.getElementById('aNam').style.color=a.col;
+  document.getElementById('aDsc').textContent=a.dsc;
+  document.getElementById('cPct').textContent=res.conf+'%';
+  const cf=document.getElementById('cFil');
+  cf.style.width=res.conf+'%';
+  cf.style.background=a.col;
+  document.getElementById('rPoly').setAttribute('points',pts_r);
+  document.getElementById('rPoly').style.stroke=a.col;
+  document.getElementById('rPoly').style.fill=a.col+'33';
+  const el=document.getElementById('pres');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&['pts','reb','ast','age'].includes(e.target.id))runP();
+});
+</script>
+</body>
+</html>
