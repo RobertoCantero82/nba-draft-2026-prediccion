@@ -84,21 +84,43 @@ JUGADORES = {
         "mock_pick": "~#9", "mock_num": 9,
         "stats": {"PTS": 12.1, "REB": 6.8, "AST": 0.9, "ROB": 0.4, "TAP": 2.6, "FG%": 67.0},
         "comparable": {"nombre": "Kristaps Porzingis", "desc": "Pívot europeo con impacto defensivo de élite y techo ofensivo sin explotar", "youtube": "https://www.youtube.com/watch?v=hiMFQ-gewJ8"},
-        "arquetipo_label": "Pívot Defensivo Atlético", "color": "#F5EE20"
+        "arquetipo_label": "Pívot Defensivo Atlético", "color": "#F5EE20",
+        # resultados reales del modelo (modelo_rango_sin_posicion + modelo_ronda_sin_posicion)
+        "pred_real": {
+            "probs_ronda": {"R1": 0.236, "R2": 0.355, "ND": 0.409},
+            "probs_rango": {"1-10": 0.083, "11-20": 0.061, "21-30": 0.064, "31-40": 0.043, "41-50": 0.658, "51-60": 0.046, "ND": 0.045},
+            "prob_draft": 95.5,
+            "ronda_pred": "R2",
+            "rango_pred": "41-50",
+        }
     },
     "Baba Miller": {
         "posicion": "Ala-Pívot", "liga": "NCAA - Florida State", "edad": 22, "altura": "2.06m",
         "mock_pick": "~#45", "mock_num": 45,
         "stats": {"PTS": 13.0, "REB": 10.3, "AST": 1.2, "ROB": 0.8, "TAP": 0.9, "FG%": 52.0},
         "comparable": {"nombre": "Pascal Siakam", "desc": "Una versión joven con tremenda movilidad lateral y gran capacidad para correr la pista como una gacela", "youtube": "https://www.youtube.com/watch?v=YqC7a5LVW3I"},
-        "arquetipo_label": "Ala-Pívot Físico y Reboteador", "color": "#D61616"
+        "arquetipo_label": "Ala-Pívot Físico y Reboteador", "color": "#D61616",
+        "pred_real": {
+            "probs_ronda": {"R1": 0.245, "R2": 0.363, "ND": 0.393},
+            "probs_rango": {"1-10": 0.154, "11-20": 0.041, "21-30": 0.062, "31-40": 0.035, "41-50": 0.621, "51-60": 0.037, "ND": 0.051},
+            "prob_draft": 94.9,
+            "ronda_pred": "R2",
+            "rango_pred": "41-50",
+        }
     },
     "Sergio de Larrea": {
         "posicion": "Base", "liga": "ACB - Valencia Basket", "edad": 21, "altura": "1.96m",
         "mock_pick": "~#40", "mock_num": 40,
         "stats": {"PTS": 9.5, "REB": 3.1, "AST": 4.2, "ROB": 1.1, "TAP": 0.2, "FG%": 44.0},
         "comparable": {"nombre": "Josh Giddey", "desc": "Gran tamaño y creatividad, pero con la duda de una primera marcha explosiva o un físico realmente preparado", "youtube": "https://www.youtube.com/watch?v=uS6aP-i_2BQ"},
-        "arquetipo_label": "Base Pasador y Defensor", "color": "#F88A2A"
+        "arquetipo_label": "Base Pasador y Defensor", "color": "#F88A2A",
+        "pred_real": {
+            "probs_ronda": {"R1": 0.185, "R2": 0.259, "ND": 0.556},
+            "probs_rango": {"1-10": 0.122, "11-20": 0.061, "21-30": 0.063, "31-40": 0.115, "41-50": 0.440, "51-60": 0.083, "ND": 0.117},
+            "prob_draft": 88.3,
+            "ronda_pred": "R2",
+            "rango_pred": "41-50",
+        }
     }
 }
 
@@ -125,45 +147,38 @@ def cargar_modelos():
 
 modelo_ronda, modelo_rango, le_ronda, le_rango, medianas_train, modelos_ok = cargar_modelos()
 
-# ── DEBUG SIDEBAR — eliminar tras confirmar que medianas_train carga bien ──
-_base_debug  = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'pkl')
-_ruta_debug  = os.path.normpath(os.path.join(_base_debug, 'preprocesado', 'medianas_features.pkl'))
-st.sidebar.markdown("### 🔧 Debug")
-st.sidebar.write(f"modelos_ok: `{modelos_ok}`")
-st.sidebar.write(f"medianas cargadas: `{medianas_train is not None}`")
-st.sidebar.write(f"ruta buscada:")
-st.sidebar.code(_ruta_debug)
-st.sidebar.write(f"existe en disco: `{os.path.exists(_ruta_debug)}`")
+
 
 
 # ─────────────────────────────────────────────
 # FUNCIONES AUXILIARES
 # ─────────────────────────────────────────────
-def build_input(pts, reb, ast, rob, tap, cols_modelo):
+def build_input(pts, reb, ast, rob, tap, cols_modelo, imputar_ceros=False):
     """construyo el dataframe con todas las features del modelo.
-    las stats del usuario se mapean directamente; el resto se imputa
-    con la mediana del train para no sesgar la predicción con ceros."""
+    imputar_ceros=True replica el comportamiento del notebook (sección 9):
+    el resto de features a 0, exactamente igual que al generar la gráfica.
+    imputar_ceros=False usa medianas del train (modo draft personalizado)."""
     input_usuario = {'pts': pts, 'treb': reb, 'ast': ast, 'stl': rob, 'blk': tap}
-    if medianas_train is not None:
-        fila = medianas_train.reindex(cols_modelo).to_dict()
-    else:
+    if imputar_ceros or medianas_train is None:
         fila = {col: 0 for col in cols_modelo}
+    else:
+        fila = medianas_train.reindex(cols_modelo).to_dict()
     for col, val in input_usuario.items():
         if col in fila:
             fila[col] = val
     return pd.DataFrame([fila])[cols_modelo]
 
 
-def predecir_jugador(pts, reb, ast, rob, tap):
+def predecir_jugador(pts, reb, ast, rob, tap, imputar_ceros=False):
     """ejecuto los modelos de ronda y rango y devuelvo las probabilidades."""
     if not modelos_ok:
         return None
     cols_ronda  = list(modelo_ronda.feature_names_in_)
-    X_ronda     = build_input(pts, reb, ast, rob, tap, cols_ronda)
+    X_ronda     = build_input(pts, reb, ast, rob, tap, cols_ronda, imputar_ceros)
     probs_ronda = modelo_ronda.predict_proba(X_ronda)[0]
     clases_ronda = le_ronda.classes_
     cols_rango  = list(modelo_rango.feature_names_in_)
-    X_rango     = build_input(pts, reb, ast, rob, tap, cols_rango)
+    X_rango     = build_input(pts, reb, ast, rob, tap, cols_rango, imputar_ceros)
     probs_rango = modelo_rango.predict_proba(X_rango)[0]
     clases_rango = le_rango.classes_
     return {
@@ -178,39 +193,39 @@ def predecir_jugador(pts, reb, ast, rob, tap):
 # ─────────────────────────────────────────────
 REFERENCIAS_NBA = {
     "🗼 Pívot Clásico": [
-        {"nombre": "Marc Gasol",       "youtube": "https://www.youtube.com/watch?v=4_KFpHDsHDk"},
-        {"nombre": "Steven Adams",     "youtube": "https://www.youtube.com/watch?v=RqFSEPMODuI"},
-        {"nombre": "Shaquille O'Neal", "youtube": "https://www.youtube.com/watch?v=P7GHBTmWvmQ"},
+        {"nombre": "Marc Gasol",       "youtube": "https://www.youtube.com/watch?v=VEa2ckauBjs"},
+        {"nombre": "Steven Adams",     "youtube": "https://www.youtube.com/watch?v=PYWFAKqf3-g"},
+        {"nombre": "Shaquille O'Neal", "youtube": "https://www.youtube.com/watch?v=dkrPBAhVFn0"},
     ],
     "🏀 Alero / Escolta Versátil": [
-        {"nombre": "Aaron Gordon",    "youtube": "https://www.youtube.com/watch?v=GZ2RUhBbKcA"},
-        {"nombre": "Blake Griffin",   "youtube": "https://www.youtube.com/watch?v=9oDNsGFnHsI"},
-        {"nombre": "Carmelo Anthony", "youtube": "https://www.youtube.com/watch?v=OIdsrVGCeZA"},
+        {"nombre": "Aaron Gordon",    "youtube": "https://www.youtube.com/watch?v=9B_e_XJyHmU"},
+        {"nombre": "Blake Griffin",   "youtube": "https://www.youtube.com/watch?v=hoarqsrBULo"},
+        {"nombre": "Carmelo Anthony", "youtube": "https://www.youtube.com/watch?v=Ut29ViTVqQM"},
     ],
     "🎯 Base / Escolta Pequeño": [
-        {"nombre": "Chris Paul",    "youtube": "https://www.youtube.com/watch?v=HVotEZwDRzI"},
-        {"nombre": "Kyle Lowry",    "youtube": "https://www.youtube.com/watch?v=pJnFSEuqpvI"},
-        {"nombre": "Isaiah Thomas", "youtube": "https://www.youtube.com/watch?v=1QKSE_4OBRE"},
+        {"nombre": "Chris Paul",    "youtube": "https://www.youtube.com/watch?v=DTqykY_UlFw"},
+        {"nombre": "Kyle Lowry",    "youtube": "https://www.youtube.com/watch?v=I14RCpMDxg4"},
+        {"nombre": "Isaiah Thomas", "youtube": "https://www.youtube.com/watch?v=3mUNX086R50"},
     ],
     "⚡ Base / Escolta Explosivo": [
-        {"nombre": "Russell Westbrook", "youtube": "https://www.youtube.com/watch?v=A_2YsRGFGQ"},
-        {"nombre": "De'Aaron Fox",      "youtube": "https://www.youtube.com/watch?v=V4tHN0RFOqc"},
-        {"nombre": "John Wall",         "youtube": "https://www.youtube.com/watch?v=c7FS5nFWFpk"},
+        {"nombre": "Russell Westbrook", "youtube": "https://www.youtube.com/watch?v=bxLbsmZ9qaY"},
+        {"nombre": "De'Aaron Fox",      "youtube": "https://www.youtube.com/watch?v=B-8axVLwiRs"},
+        {"nombre": "John Wall",         "youtube": "https://www.youtube.com/watch?v=9zkcPraU6-s"},
     ],
     "💥 Alero Atlético Explosivo": [
-        {"nombre": "Anthony Edwards", "youtube": "https://www.youtube.com/watch?v=rjDMkHjCvPE"},
-        {"nombre": "LeBron James",    "youtube": "https://www.youtube.com/watch?v=_kOSCK_8yOU"},
-        {"nombre": "Vince Carter",    "youtube": "https://www.youtube.com/watch?v=IzKRmPJX3XM"},
+        {"nombre": "Anthony Edwards", "youtube": "https://www.youtube.com/watch?v=T5I70wkGVLI"},
+        {"nombre": "LeBron James",    "youtube": "https://www.youtube.com/watch?v=-9lP95Qo-I0"},
+        {"nombre": "Vince Carter",    "youtube": "https://www.youtube.com/watch?v=LrIfS5_TyQQ"},
     ],
     "🌟 Pívot Élite Moderno": [
-        {"nombre": "Anthony Davis", "youtube": "https://www.youtube.com/watch?v=nRbOVFMEKAc"},
-        {"nombre": "Joel Embiid",   "youtube": "https://www.youtube.com/watch?v=aQTGJGWKSoA"},
-        {"nombre": "Nikola Jokic",  "youtube": "https://www.youtube.com/watch?v=zHR8NLxFjU8"},
+        {"nombre": "Anthony Davis", "youtube": "https://www.youtube.com/watch?v=0ufyaXWbsnc"},
+        {"nombre": "Joel Embiid",   "youtube": "https://www.youtube.com/watch?v=YrCTZtmpyLo"},
+        {"nombre": "Nikola Jokic",  "youtube": "https://www.youtube.com/watch?v=7A-QGpW2GnA"},
     ],
     "🛡️ Alero / Escolta Duro": [
-        {"nombre": "Jimmy Butler",  "youtube": "https://www.youtube.com/watch?v=nbmqXPf7T6I"},
-        {"nombre": "Jrue Holiday",  "youtube": "https://www.youtube.com/watch?v=IBLZ8NRVB0A"},
-        {"nombre": "Paul Pierce",   "youtube": "https://www.youtube.com/watch?v=D5xnqKJCpRI"},
+        {"nombre": "Jimmy Butler",  "youtube": "https://www.youtube.com/watch?v=aUnKhL3uHD4"},
+        {"nombre": "Jrue Holiday",  "youtube": "https://www.youtube.com/watch?v=bxLGOD0B0kw"},
+        {"nombre": "Paul Pierce",   "youtube": "https://www.youtube.com/watch?v=lh0YxMd3FfU"},
     ],
 }
 
@@ -265,48 +280,21 @@ def prob_bar_html(label, valor, color="#1B4F8A"):
 # ─────────────────────────────────────────────
 # HEADER
 # ─────────────────────────────────────────────
-_header_html = (
-    '<div style="background:linear-gradient(135deg,#1B4F8A 0%,#0d3060 55%,#c94a0a 100%);'
-    'border-radius:16px;padding:0;margin-bottom:1.5rem;height:110px;position:relative;'
-    'overflow:hidden;display:flex;align-items:stretch;">'
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:9rem;color:rgba(247,82,10,0.18);'
-    'position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);line-height:1;'
-    'pointer-events:none;letter-spacing:-2px;">2026</div>'
-    '<div style="display:flex;flex-direction:column;justify-content:center;padding:0 2rem;min-width:300px;z-index:2;">'
-    '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.1rem">'
-    '<span style="font-size:1.6rem">&#127919;</span>'
-    '<span style="font-family:Bebas Neue,sans-serif;font-size:2.4rem;color:white;letter-spacing:4px;line-height:1;">DraftRadar</span>'
-    '</div>'
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:rgba(255,255,255,0.65);letter-spacing:2.5px;margin-bottom:0.25rem;">'
-    'NBA DRAFT 2026 &middot; CANDIDATOS ESPA&Ntilde;OLES</div>'
-    '<div style="font-size:0.78rem;color:rgba(255,255,255,0.45);letter-spacing:0.3px;">'
-    'Machine Learning aplicado al draft &mdash; The Bridge Data Science Bootcamp</div>'
-    '</div>'
-    '<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:2rem;z-index:2;padding:0 1rem;">'
-    '<div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem">'
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:white;letter-spacing:2px;">ADAY MARA</div>'
-    '<div style="width:46px;height:62px;background:rgba(255,255,255,0.08);border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">'
-    '<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z"/><path d="M12 14.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>'
-    '<span style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:#F7520A;line-height:1;">#9</span></div></div>'
-    '<div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem">'
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:white;letter-spacing:2px;">BABA MILLER</div>'
-    '<div style="width:46px;height:62px;background:rgba(255,255,255,0.08);border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">'
-    '<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z"/><path d="M12 14.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>'
-    '<span style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:#F7520A;line-height:1;">#45</span></div></div>'
-    '<div style="display:flex;flex-direction:column;align-items:center;gap:0.4rem">'
-    '<div style="font-family:Bebas Neue,sans-serif;font-size:0.8rem;color:white;letter-spacing:2px;">SERGIO DE LARREA</div>'
-    '<div style="width:46px;height:62px;background:rgba(255,255,255,0.08);border-radius:8px;border:1.5px solid rgba(255,255,255,0.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">'
-    '<svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(255,255,255,0.7)"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12z"/><path d="M12 14.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>'
-    '<span style="font-family:Bebas Neue,sans-serif;font-size:0.95rem;color:#F7520A;line-height:1;">#40</span></div></div>'
-    '</div></div>'
+st.markdown(
+    '<div style="margin-bottom:1.8rem;padding:0.5rem 0 0.3rem 0;border-bottom:3px solid #F7520A;">'
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:4rem;color:#1B4F8A;'
+    'letter-spacing:6px;line-height:1;margin-bottom:0.15rem;">Draft Radar</div>'
+    '<div style="font-size:1rem;color:#6B7280;font-style:italic;margin-top:0.2rem;">'
+    'La herramienta de predicción para el periodista del siglo XXI</div>'
+    '</div>',
+    unsafe_allow_html=True
 )
-st.markdown(_header_html, unsafe_allow_html=True)
 
 
 # ─────────────────────────────────────────────
 # TABS PRINCIPALES
 # ─────────────────────────────────────────────
-tab1, tab2, tab3 = st.tabs(["Españoles 2026", "Draft personalizado", "Funcionamiento del predictor"])
+tab1, tab2, tab3 = st.tabs(["Españoles 2026", "Draft personalizado", "Acerca de"])
 
 
 # ═════════════════════════════════════════════
@@ -354,43 +342,48 @@ with tab1:
                     st.session_state[f"pred_{nombre}"] = True
 
             if st.session_state.get(f"pred_{nombre}"):
-                resultado = predecir_jugador(stats["PTS"], stats["REB"], stats["AST"], stats["ROB"], stats["TAP"])
+                resultado = predecir_jugador(stats["PTS"], stats["REB"], stats["AST"], stats["ROB"], stats["TAP"], imputar_ceros=True)
 
+                # si los modelos cargan en runtime, uso sus probs; si no, uso los resultados
+                # reales precalculados del notebook (mismos modelos, mismos datos de entrada)
                 if resultado:
-                    pr = resultado["probs_ronda"]
-                    pg = resultado["probs_rango"]
+                    pr         = resultado["probs_ronda"]
+                    pg         = resultado["probs_rango"]
                     ronda_pred = max(pr, key=pr.get)
                     rango_pred = max(pg, key=pg.get)
                     prob_draft = resultado["prob_draft"]
-                    st.markdown(f"""
-                    <div class="pred-box">
-                        <div class="pred-title">Predicción del modelo</div>
-                        <div class="pred-row"><span class="pred-label">Ronda</span><span class="pred-value orange">{ronda_pred}</span></div>
-                        <div class="pred-row"><span class="pred-label">Rango de pick</span><span class="pred-value white">{rango_pred}</span></div>
-                        <div class="pred-row"><span class="pred-label">Prob. de ser drafteado</span><span class="pred-value orange">{prob_draft:.1f}%</span></div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    bars_html = "<div style='margin-top:0.8rem'>"
-                    for clase, prob in sorted(pr.items(), key=lambda x: -x[1]):
-                        bars_html += prob_bar_html(clase, prob, color_map.get(clase, "#888"))
-                    bars_html += "</div>"
-                    st.markdown(bars_html, unsafe_allow_html=True)
                 else:
-                    probs_demo = {"ND": 0.354, "R1": 0.253, "R2": 0.393}
-                    st.markdown(f"""
-                    <div class="pred-box">
-                        <div class="pred-title">Predicción del modelo · Demo</div>
-                        <div class="pred-row"><span class="pred-label">Ronda</span><span class="pred-value orange">R2</span></div>
-                        <div class="pred-row"><span class="pred-label">Rango de pick</span><span class="pred-value white">41-50</span></div>
-                        <div class="pred-row"><span class="pred-label">Prob. de ser drafteado</span><span class="pred-value orange">64.6%</span></div>
-                        <div class="pred-row"><span class="pred-label">Arquetipo</span><span class="pred-value white" style="font-size:0.94rem">{datos['arquetipo_label']}</span></div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    bars_html = "<div style='margin-top:0.8rem'>"
-                    for clase, prob in sorted(probs_demo.items(), key=lambda x: -x[1]):
-                        bars_html += prob_bar_html(clase, prob, color_map.get(clase, "#888"))
-                    bars_html += "</div>"
-                    st.markdown(bars_html, unsafe_allow_html=True)
+                    pred       = datos["pred_real"]
+                    pr         = pred["probs_ronda"]
+                    pg         = pred["probs_rango"]
+                    ronda_pred = pred["ronda_pred"]
+                    rango_pred = pred["rango_pred"]
+                    prob_draft = pred["prob_draft"]
+
+                st.markdown(f"""
+                <div class="pred-box">
+                    <div class="pred-title">Predicción del modelo</div>
+                    <div class="pred-row"><span class="pred-label">Ronda</span><span class="pred-value orange">{ronda_pred}</span></div>
+                    <div class="pred-row"><span class="pred-label">Rango de pick</span><span class="pred-value white">{rango_pred}</span></div>
+                    <div class="pred-row"><span class="pred-label">Prob. de ser drafteado</span><span class="pred-value orange">{prob_draft:.1f}%</span></div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # barras de ronda
+                bars_html = "<div style='margin-top:0.8rem'>"
+                for clase, prob in sorted(pr.items(), key=lambda x: -x[1]):
+                    bars_html += prob_bar_html(clase, prob, color_map.get(clase, "#888"))
+                bars_html += "</div>"
+                st.markdown(bars_html, unsafe_allow_html=True)
+
+                # barras de rango de pick
+                st.markdown("##### Probabilidades por rango de pick")
+                rangos_ordenados = ["1-10","11-20","21-30","31-40","41-50","51-60","ND"]
+                colores_rangos   = ["#0d3060","#1B4F8A","#2e6fba","#5a94d4","#8fbce6","#b8d6f0","#9CA3AF"]
+                bars_rango = ""
+                for rango, color_r in zip(rangos_ordenados, colores_rangos):
+                    bars_rango += prob_bar_html(rango, pg.get(rango, 0), color_r)
+                st.markdown(bars_rango, unsafe_allow_html=True)
 
                 st.markdown(f"""
                 <div class="comparable-box">
@@ -528,35 +521,70 @@ with tab2:
 
 
 # ═════════════════════════════════════════════
-# TAB 3 — CÓMO FUNCIONA
+# TAB 3 — PARA PERIODISTAS
 # ═════════════════════════════════════════════
 with tab3:
-    c3a, c3b, c3c = st.columns(3, gap="large")
+    st.markdown("""
+    <div style="width:100%;">
 
-    with c3a:
-        st.markdown("""
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#1B4F8A;letter-spacing:2px;margin-bottom:0.8rem">⚙️ Los modelos</div>
-        <div class="info-box" style="margin-bottom:0.6rem"><p><strong>Ronda</strong> (Random Forest)<br>R1 / R2 / ND. Entrenado con NCAA 2009–2021. F1 macro 0.60.</p></div>
-        <div class="info-box" style="margin-bottom:0.6rem"><p><strong>Rango de pick</strong> (XGBoost)<br>7 clases: 1-10 hasta 51-60 + ND. F1 macro 0.23 — techo estructural del problema.</p></div>
-        <div class="info-box"><p><strong>Arquetipo</strong> (K-Means k=7)<br>Entrenado con datos del NBA Combine: altura, peso, envergadura, salto y agilidad.</p></div>
-        """, unsafe_allow_html=True)
-
-    with c3b:
-        st.markdown("""
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#1B4F8A;letter-spacing:2px;margin-bottom:0.8rem">⚠️ Limitaciones</div>
-        <div class="info-box" style="border-left-color:#F7520A;margin-bottom:0.6rem"><p><strong>Dataset NCAA americano.</strong> Los tres candidatos son europeos sin precedente directo en el entrenamiento. El modelo solo ve estadísticas numéricas.</p></div>
-        <div class="info-box" style="border-left-color:#F7520A"><p><strong>Probabilidad, no certeza.</strong> La distribución R1+R2+ND es la señal clave, no la clase predicha. Un 35% de ND indica incertidumbre alta, no descarte.</p></div>
-        """, unsafe_allow_html=True)
-
-    with c3c:
-        st.markdown("""
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#1B4F8A;letter-spacing:2px;margin-bottom:0.8rem">📊 El dataset</div>
-        <div style="background:linear-gradient(135deg,#1B4F8A,#0d3060);border-radius:14px;padding:1.5rem;color:white;text-align:center;margin-bottom:0.6rem">
-            <div style="display:flex;justify-content:space-around">
-                <div><div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#F7520A">~1.200</div><div style="font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px">jugadores</div></div>
-                <div><div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#F7520A">12</div><div style="font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px">temporadas</div></div>
-                <div><div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:#F7520A">34</div><div style="font-size:0.75rem;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:1px">variables</div></div>
-            </div>
+    <div style="margin-bottom:2rem;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#1B4F8A;
+                    letter-spacing:2px;margin-bottom:0.6rem;">
+            Qué te da esta herramienta
         </div>
-        <div class="info-box" style="border-left-color:#F7520A"><p><strong>El draft no es solo estadística.</strong> Scouts, entrevistas, atletismo y necesidades de cada equipo son información que el modelo no tiene. Esa brecha ML–scouts es el hallazgo más interesante del proyecto.</p></div>
-        """, unsafe_allow_html=True)
+        <p style="font-size:1rem;color:#374151;line-height:1.75;margin:0;">
+            Draft Radar analiza las estadísticas de temporada de cualquier jugador y las compara
+            con el histórico de más de 1.200 universitarios que pasaron por el proceso de draft
+            entre 2009 y 2021. El resultado es una <strong style="color:#1B4F8A;">distribución de probabilidades</strong>:
+            cuántas posibilidades tiene ese jugador de ser elegido en primera ronda, en segunda,
+            o de quedarse fuera. No es una predicción cerrada. Es un punto de partida
+            cuantitativo para construir un artículo con más capas.
+        </p>
+    </div>
+
+    <div style="height:1px;background:linear-gradient(to right,#F7520A,transparent);margin-bottom:2rem;"></div>
+
+    <div style="margin-bottom:2rem;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#1B4F8A;
+                    letter-spacing:2px;margin-bottom:0.6rem;">
+            Cómo leer los resultados
+        </div>
+        <p style="font-size:1rem;color:#374151;line-height:1.75;margin:0 0 0.8rem 0;">
+            Lo más valioso no es la clase predicha —<em>R1, R2 o ND</em>— sino la
+            <strong style="color:#1B4F8A;">distribución completa de probabilidades</strong>.
+            Un jugador con un 55% de ND no es un descartado: es un caso de alta incertidumbre,
+            y eso en sí mismo es una historia. Un jugador con un 80% de probabilidad de segunda
+            ronda pero proyectado por los scouts en el top 10 señala exactamente la brecha
+            entre lo que dicen los números y lo que ven los ojeadores sobre el terreno.
+        </p>
+        <p style="font-size:1rem;color:#374151;line-height:1.75;margin:0;">
+            La pestaña <strong style="color:#1B4F8A;">Draft personalizado</strong> permite
+            introducir las estadísticas de cualquier jugador —no solo los tres españoles—
+            y obtener su perfil de probabilidades al instante.
+        </p>
+    </div>
+
+    <div style="height:1px;background:linear-gradient(to right,#F7520A,transparent);margin-bottom:2rem;"></div>
+
+    <div style="margin-bottom:1rem;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#1B4F8A;
+                    letter-spacing:2px;margin-bottom:0.6rem;">
+            Lo que los datos no pueden ver
+        </div>
+        <p style="font-size:1rem;color:#374151;line-height:1.75;margin:0 0 0.8rem 0;">
+            El modelo fue entrenado con estadísticas de jugadores universitarios americanos.
+            Aday Mara parece que podría subir posiciones en el Draft, Baba Miller puede rondar
+            las predicciones de este modelo y Sergio de Larrea, al llegar desde Europa, tiene un Draft incierto.
+        </p>
+        <p style="font-size:1rem;color:#374151;line-height:1.75;margin:0;">
+            Además, el draft nunca es solo estadística. El estado físico en el combine,
+            las entrevistas con los equipos, la necesidad de cada franquicia en cada posición,
+            el carácter del jugador —todo eso pesa, y nada de eso aparece en una hoja de cálculo.
+            <strong style="color:#F7520A;">Esa brecha entre lo que predice el modelo y lo que
+            decide el scout es, precisamente, la mejor historia que puede contar un periodista
+            con esta herramienta.</strong>
+        </p>
+    </div>
+
+    </div>
+    """, unsafe_allow_html=True)
