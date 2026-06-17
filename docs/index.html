@@ -9,13 +9,13 @@
 :root{--bg:#F4EFE4;--sur:#EDE7D9;--sur2:#E5DDCC;--bdr:#C8BEA8;--acc:#C04A12;--acc2:#DC5A22;--crm:#1A1410;--cdm:#3A2E22;--cmt:#7A6E5C;--grn:#2E6820;--red:#A02018;--blu:#284A7A}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--crm);font-family:'Barlow',sans-serif;font-weight:300;line-height:1.7;font-size:17px}
-.hero{max-width:880px;margin:0 auto;padding:72px 24px 56px;border-bottom:1px solid var(--bdr)}
+.hero{max-width:1400px;margin:0 auto;padding:72px 48px 56px;border-bottom:1px solid var(--bdr)}
 h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(48px,8vw,80px);line-height:.93;text-transform:uppercase;letter-spacing:-.01em;color:var(--crm);margin-bottom:24px}
 h1 div{display:block}
 .hlead{font-size:19px;color:var(--cdm);max-width:600px;line-height:1.6;margin-bottom:36px;font-weight:400}
-.cnt{max-width:880px;margin:0 auto;padding:0 24px}
+.cnt{max-width:1400px;margin:0 auto;padding:0 48px}
 .intro{padding:56px 0 0}
-.intro p{color:var(--cdm);margin-bottom:20px;max-width:700px}
+.intro p{color:var(--cdm);margin-bottom:20px;max-width:900px}
 .intro p strong{color:var(--crm);font-weight:500}
 .shead{display:flex;align-items:center;gap:16px;margin:0 0 48px;padding-top:56px;border-top:1px solid var(--bdr)}
 .shead .slbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.15em;white-space:nowrap}
@@ -84,7 +84,7 @@ h1 div{display:block}
 .cbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--cmt);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:flex;justify-content:space-between}
 .cbt{height:4px;background:var(--bdr);width:100%}
 .cbf{height:4px;background:var(--acc);transition:width .6s ease}
-footer{border-top:1px solid var(--bdr);padding:36px 24px;max-width:880px;margin:0 auto}
+footer{border-top:1px solid var(--bdr);padding:36px 48px;max-width:1400px;margin:0 auto}
 .fin{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .flogo{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--cmt)}
 .flogo span{color:var(--acc)}
@@ -242,55 +242,6 @@ footer{border-top:1px solid var(--bdr);padding:36px 24px;max-width:880px;margin:
     <div class="verd"><div class="vbar"></div><p><strong>DraftRadar lo proyecta como pick ~#40, segunda ronda, arquetipo Playmaker Perímetro.</strong> El rango realista oscila entre el pick 28 y el 58. Una franquicia con visión a largo plazo tiene en De Larrea una de las mejores apuestas silenciosas de todo el draft.</p></div>
   </div>
 
-  <!-- PREDICTOR -->
-  <div class="shead"><span class="slbl">// DraftRadar · Predicción Manual</span><div class="sline"></div></div>
-
-  <div class="pred-sec">
-    <div class="pred-hdr">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" stroke="#DC5A22" stroke-width="2"/><line x1="3" y1="16" x2="29" y2="16" stroke="#DC5A22" stroke-width="1.5"/><path d="M16 3 Q22 16 16 29" fill="none" stroke="#DC5A22" stroke-width="1.5"/><path d="M16 3 Q10 16 16 29" fill="none" stroke="#DC5A22" stroke-width="1.5"/><circle cx="16" cy="16" r="2.5" fill="#DC5A22"/></svg>
-      <div>
-        <div class="pred-title">Prueba el modelo</div>
-        <div class="pred-sub">Introduce estadísticas y obtén la proyección DraftRadar</div>
-      </div>
-    </div>
-    <div class="pgrid">
-      <div class="ig"><label>Puntos por partido (PPG)</label><input type="number" id="pts" placeholder="ej. 12.1" min="0" max="40" step="0.1"></div>
-      <div class="ig"><label>Rebotes por partido (RPG)</label><input type="number" id="reb" placeholder="ej. 6.8" min="0" max="25" step="0.1"></div>
-      <div class="ig"><label>Asistencias por partido (APG)</label><input type="number" id="ast" placeholder="ej. 2.4" min="0" max="15" step="0.1"></div>
-      <div class="ig"><label>Posición</label><select id="pos"><option value="">— Seleccionar —</option><option value="PG">Base (PG)</option><option value="SG">Escolta (SG)</option><option value="SF">Alero (SF)</option><option value="PF">Ala-Pívot (PF)</option><option value="C">Pívot (C)</option></select></div>
-      <div class="ig"><label>Liga de procedencia</label><select id="league"><option value="">— Seleccionar —</option><option value="NCAA">NCAA (EE.UU.)</option><option value="EuroLeague">EuroLeague</option><option value="ACB">ACB (España)</option><option value="NBL">NBL (Australia)</option><option value="Other">Otra liga</option></select></div>
-      <div class="ig"><label>Edad en el Draft</label><input type="number" id="age" placeholder="ej. 21" min="17" max="28"></div>
-    </div>
-    <button class="pbtn" onclick="runP()">&#9654; ANALIZAR CON DRAFTRADAR</button>
-    <div class="pres" id="pres">
-      <div class="rdiv"></div>
-      <div class="rgrid">
-        <div class="rc ra"><div class="rcl">Pick proyectado</div><div class="rcv" id="rPick">—</div><div class="rcs" id="rRange">Rango: —</div></div>
-        <div class="rc"><div class="rcl">Ronda</div><div class="rcv" id="rRound" style="color:var(--crm)">—</div><div class="rcs" id="rRoundS">—</div></div>
-        <div class="rc"><div class="rcl">Score DraftRadar</div><div class="rcv" id="rScore" style="color:var(--cdm)">—</div><div class="rcs">sobre 100</div></div>
-      </div>
-      <div class="ard">
-        <div class="aico" id="aIco">🏀</div>
-        <div><div class="anam" id="aNam">—</div><div class="adsc" id="aDsc">—</div></div>
-      </div>
-      <div class="cbw">
-        <div class="cbl"><span>Confianza del modelo</span><span id="cPct">—</span></div>
-        <div class="cbt"><div class="cbf" id="cFil" style="width:0%"></div></div>
-      </div>
-      <div class="rradar">
-        <div class="rl">Perfil generado por DraftRadar</div>
-        <svg id="rRdr" width="180" height="180" viewBox="0 0 180 180">
-          <polygon points="90,16 152,54 152,126 90,164 28,126 28,54" fill="none" stroke="#C8BEA8" stroke-width="1"/>
-          <polygon points="90,36 137,63 137,117 90,144 43,117 43,63" fill="none" stroke="#C8BEA8" stroke-width="1"/>
-          <polygon points="90,56 122,72 122,108 90,124 58,108 58,72" fill="none" stroke="#C8BEA8" stroke-width="1"/>
-          <line x1="90" y1="90" x2="90" y2="16" stroke="#C8BEA8"/><line x1="90" y1="90" x2="152" y2="54" stroke="#C8BEA8"/><line x1="90" y1="90" x2="152" y2="126" stroke="#C8BEA8"/><line x1="90" y1="90" x2="90" y2="164" stroke="#C8BEA8"/><line x1="90" y1="90" x2="28" y2="126" stroke="#C8BEA8"/><line x1="90" y1="90" x2="28" y2="54" stroke="#C8BEA8"/>
-          <polygon id="rPoly" points="90,90 90,90 90,90 90,90 90,90 90,90" fill="rgba(220,90,34,0.2)" stroke="#DC5A22" stroke-width="1.5"/>
-          <text x="90" y="10" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">DEF</text><text x="158" y="56" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">ATL</text><text x="158" y="129" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">TIR</text><text x="90" y="176" text-anchor="middle" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">REB</text><text x="22" y="129" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">IQ</text><text x="22" y="56" text-anchor="end" fill="#7A6E5C" font-family="IBM Plex Mono" font-size="7">FÍS</text>
-        </svg>
-      </div>
-    </div>
-  </div>
-
   <!-- APP IFRAME -->
   <div class="shead"><span class="slbl">// DraftRadar · App Completa</span><div class="sline"></div></div>
   <div style="margin-bottom:64px;">
@@ -304,7 +255,7 @@ footer{border-top:1px solid var(--bdr);padding:36px 24px;max-width:880px;margin:
     <iframe
       src="https://robertocantero-draftradar-2026.hf.space"
       width="100%"
-      height="900"
+      height="1000"
       style="border:1px solid var(--bdr);display:block;"
       allow="fullscreen"
       loading="lazy"
