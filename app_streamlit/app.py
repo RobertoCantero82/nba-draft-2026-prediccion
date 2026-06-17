@@ -133,7 +133,10 @@ SPIDER_MAX   = [35.0, 15.0, 10.0, 3.5, 4.0, 85.0]
 # ─────────────────────────────────────────────
 @st.cache_resource
 def cargar_modelos():
-    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'pkl')
+    _dir = os.path.dirname(os.path.abspath(__file__))
+    _local = os.path.join(_dir, '..', 'pkl')
+    _hf    = os.path.join(_dir, 'pkl')
+    base   = _hf if os.path.exists(_hf) else _local
     try:
         modelo_ronda = joblib.load(os.path.join(base, 'modelos',      'modelo_ronda_sin_posicion.pkl'))
         modelo_rango = joblib.load(os.path.join(base, 'modelos',      'modelo_rango_sin_posicion.pkl'))
